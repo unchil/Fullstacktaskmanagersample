@@ -28,11 +28,13 @@ kotlin {
     }
     
     jvm()
-    
+    /*
     js {
         browser()
         binaries.executable()
     }
+
+     */
     
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -54,6 +56,9 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            implementation(libs.un7datagrid)
+
             implementation(projects.shared)
         }
         commonTest.dependencies {

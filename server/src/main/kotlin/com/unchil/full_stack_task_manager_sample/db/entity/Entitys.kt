@@ -1,9 +1,9 @@
 package com.unchil.full_stack_task_manager_sample.db.entity
 
-import com.unchil.full_stack_task_manager_sample.model.Observation
-import com.unchil.full_stack_task_manager_sample.model.Observatory
-import com.unchil.full_stack_task_manager_sample.model.SeaWaterInformation
-import com.unchil.full_stack_task_manager_sample.model.SeawaterInformationByObservationPoint
+import com.unchil.full_stack_task_manager_sample.Observation
+import com.unchil.full_stack_task_manager_sample.Observatory
+import com.unchil.full_stack_task_manager_sample.SeaWaterInformation
+import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservationPoint
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.Table
 

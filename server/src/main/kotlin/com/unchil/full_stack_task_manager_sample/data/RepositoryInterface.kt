@@ -1,8 +1,9 @@
 package com.unchil.full_stack_task_manager_sample.data
 
-import com.unchil.full_stack_task_manager_sample.model.Observatory
-import com.unchil.full_stack_task_manager_sample.model.SeaWaterInfoByOneHourStat
-import com.unchil.full_stack_task_manager_sample.model.SeawaterInformationByObservationPoint
+import com.unchil.full_stack_task_manager_sample.Observatory
+import com.unchil.full_stack_task_manager_sample.SeaWaterInfoByOneHourStat
+import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservationPoint
+
 
 interface RepositoryInterface {
     suspend fun fetchSeaWaterInfoFromDb(division:String, ):List<SeawaterInformationByObservationPoint>

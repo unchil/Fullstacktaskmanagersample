@@ -8,10 +8,10 @@ import com.unchil.full_stack_task_manager_sample.db.entity.QWQObservatoryTable
 import com.unchil.full_stack_task_manager_sample.db.entity.toObservatory
 import com.unchil.full_stack_task_manager_sample.db.entity.toSeaWaterInformation
 import com.unchil.full_stack_task_manager_sample.db.entity.toSeawaterInformationByObservationPoint
-import com.unchil.full_stack_task_manager_sample.model.SeaWaterInfoByOneHourStat
-import com.unchil.full_stack_task_manager_sample.model.SeaWaterInformation
-import com.unchil.full_stack_task_manager_sample.model.SeawaterInformationByObservationPoint
-import com.unchil.full_stack_task_manager_sample.model.Observatory
+import com.unchil.full_stack_task_manager_sample.SeaWaterInfoByOneHourStat
+import com.unchil.full_stack_task_manager_sample.SeaWaterInformation
+import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservationPoint
+import com.unchil.full_stack_task_manager_sample.Observatory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit

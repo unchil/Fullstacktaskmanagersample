@@ -1,9 +1,11 @@
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -17,10 +19,12 @@ kotlin {
     iosSimulatorArm64()
     
     jvm()
-    
+    /*
     js {
         browser()
     }
+
+     */
     
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -30,7 +34,31 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // put your Multiplatform dependencies here
+            implementation(libs.kotlinx.serialization)
+            implementation(libs.ktor.clientCore)
+            implementation(libs.ktor.clientLogging)
+            implementation(libs.ktor.clientNegotiation)
+            implementation(libs.ktor.serializationJson)
+
         }
+
+        androidMain.dependencies {
+            implementation(libs.ktor.clientCio)
+        }
+
+        jvmMain.dependencies {
+            implementation(libs.ktor.clientCio)
+            implementation(libs.logback)
+        }
+
+        wasmJsMain.dependencies {
+            //   implementation(libs.ktor.client.cio)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.clientDarwin)
+        }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
