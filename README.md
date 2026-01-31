@@ -1,95 +1,72 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM), Server.
+# Fullstack Task Manager Sample (KMP)
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+A comprehensive Fullstack Kotlin Multiplatform (KMP) sample project. This project demonstrates a complete data pipeline: from collecting public data to serving it via a REST API and visualizing it on multiple platforms using Compose Multiplatform.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Project Architecture
+The project consists of four main modules:
+1. :collectionServer: A dedicated engine for fetching, parsing, and processing public data from external Open APIs.
+2. :server: A Ktor-based backend that stores collected data and provides a RESTful API service to clients.
+3. :shared: Contains common logic, data models, and business rules shared between the server and the client apps.
+4. :composeApp: The UI layer built with Compose Multiplatform, supporting Android, iOS, and Desktop, featuring advanced data visualization.
 
-* [/server](./server/src/main/kotlin) is for the Ktor server application.
 
-* [/shared](./shared/src) is for the code that will be shared between all targets in the project.
-  The most important subfolder is [commonMain](./shared/src/commonMain/kotlin). If preferred, you
-  can add code to the platform-specific folders here too.
+## Key Features
 
-### Build and Run Android Application
+• Real-time Data Collection: Automated fetching of public data (JSON/XML).
+• RESTful Service: Robust API backend providing structured data to various consumers.
+• Multiplatform UI: Single codebase for mobile and desktop environments.
+• Data Visualization: High-performance data grids and interactive charts.
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
 
-### Build and Run Desktop (JVM) Application
+## Core Multiplatform Libraries
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+This project leverages several powerful libraries to handle data and UI:
 
-### Build and Run Server
+| Library | Role | Description | 
+| :--- | :--- | :--- | 
+| Compose DataGrid | UI Component | unchil/ComposeDataGrid - Used for displaying large-scale collected data in a highly customizable table format. | 
+| KoalaPlot | Visualization | A Compose Multiplatform charting library used to render statistical data (Line, Bar, Pie charts). | 
+| Ktor | Networking | Handles HTTP requests for both the collection server (fetching) and the client app (consuming). | 
+| KotlinX Serialization| Parsing | Multiplatform JSON/XML serialization/deserialization for seamless data flow. | 
 
-To build and run the development version of the server, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :server:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :server:run
-  ```
 
-### Build and Run Web Application
+## Screenshots
 
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
+|         ScreenShot [ Browser(Safari,Chrome)/Desktop(macOS 26.2)/iOS(26.2)/Android(api 36.0) ]          |
+|:------------------------------------------------------------------------------------------------------:|
+| ![ScreenShot](https://github.com/unchil/Fullstacktaskmanagersample/raw/main/screenshot/screenshot.png) | 
 
-### Build and Run iOS Application
+## Setup & Installation
+1. GitHub Packages Configuration
+   This project uses ComposeDataGrid, which is hosted on GitHub Packages. You must configure your local.properties or environment variables to authenticate.
+   In your settings.gradle.kts:
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
 
----
+```kotlin
+maven {
+    name = "GitHubPackages"
+    url = uri("https://maven.pkg.github.com/unchil/ComposeDataGrid")
+    credentials {
+        username = System.getenv("GPR_USER") // Your GitHub Username
+        password = System.getenv("GPR_KEY")  // Your GitHub Personal Access Token (PAT)
+    }
+}
+```
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+2. Environment Variables
+   Ensure you have the following keys set in your system:
+   • GPR_USER: Your GitHub ID.
+   • GPR_KEY: A GitHub PAT with read:packages permission.
+3. Running the Project
+   • Run Backend Server: ./gradlew :server:run
+   • Run Android App: ./gradlew :composeApp:installDebug
+   • Run Desktop App: ./gradlew :composeApp:run
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+## Tech Stack
+• Language: Kotlin 2.x
+• UI Framework: Compose Multiplatform
+• Backend: Ktor
+• Concurrency: Kotlin Coroutines & Flow
+• Build Tool: Gradle (Kotlin DSL)
+
+Created for demonstrating Public Data integration with Kotlin Multiplatform.
