@@ -1,4 +1,17 @@
 # Fullstack Task Manager Sample (KMP)
+<p >
+  <img src="https://img.shields.io/badge/Kotlin-2.2.21-7F52FF?style=flat&logo=kotlin&logoColor=white" alt="Kotlin">
+  <img src="https://img.shields.io/badge/Compose_Multiplatform-1.9.3-4285F4?style=flat&logo=jetpackcompose&logoColor=white" alt="Compose Multiplatform">
+
+  <img src="https://img.shields.io/badge/-Android-3DDC84?style=flat&logo=android&logoColor=white" alt="Android">
+  <img src="https://img.shields.io/badge/-iOS-D3D3D3?style=flat&logo=apple&logoColor=white" alt="iOS">
+  <img src="https://img.shields.io/badge/-Desktop-007ACC?style=flat&logo=kotlin&logoColor=white" alt="Desktop">
+  <img src="https://img.shields.io/badge/-Web_Wasm-654FF0?style=flat&logo=webassembly&logoColor=white" alt="Web">
+</p>
+<p >
+  <img src="https://img.shields.io/badge/un7datagrid-0.2.7_3-FFA500?style=flat" alt="Version">
+  <img src="https://img.shields.io/badge/koalacore-0.10.4-green?style=flat" alt="Version">
+</p>
 
 A comprehensive Fullstack Kotlin Multiplatform (KMP) sample project. This project demonstrates a complete data pipeline: from collecting public data to serving it via a REST API and visualizing it on multiple platforms using Compose Multiplatform.
 
