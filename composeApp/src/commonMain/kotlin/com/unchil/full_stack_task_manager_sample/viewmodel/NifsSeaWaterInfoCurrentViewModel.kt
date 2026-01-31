@@ -1,35 +1,35 @@
 package com.unchil.full_stack_task_manager_sample.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.unchil.full_stack_task_manager_sample.DATA_DIVISION
 import com.unchil.full_stack_task_manager_sample.OceanWaterRepository
 import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservationPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class NifsSeaWaterInfoCurrentViewModel : ViewModel(){
+class NifsSeaWaterInfoCurrentViewModel ( scope:  CoroutineScope){
+
 
     private val repository = OceanWaterRepository()
 
     val _seaWaterInfo: MutableStateFlow<List<SeawaterInformationByObservationPoint>>
             = MutableStateFlow(emptyList())
 
-
     init {
-        viewModelScope.launch {
 
+        scope.launch {
             repository._seaWaterInfoCurrentStateFlow.collectLatest {
                 _seaWaterInfo.value = it
             }
         }
     }
 
-    suspend fun onEvent(event: NifsSeaWaterInfoViewModel.Event) {
+    suspend fun onEvent(event: NifsSeaWaterInfoCurrentViewModel.Event) {
         when (event) {
-            is NifsSeaWaterInfoViewModel.Event.Refresh -> {
+            is NifsSeaWaterInfoCurrentViewModel.Event.Refresh -> {
                 getSeaWaterInfoCurrent()
+
             }
         }
     }

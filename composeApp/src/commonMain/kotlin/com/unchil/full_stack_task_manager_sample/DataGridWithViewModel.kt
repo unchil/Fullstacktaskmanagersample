@@ -29,11 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.unchil.full_stack_task_manager_sample.theme.AppTheme
-import com.unchil.full_stack_task_manager_sample.viewmodel.MofSeaWaterInfoViewModel
-import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
+import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
 import com.unchil.un7datagrid.Un7KCMPDataGrid
 import com.unchil.un7datagrid.toMap
 import kotlinx.coroutines.launch
@@ -43,24 +40,33 @@ val LocalPlatform = compositionLocalOf<Platform> { error("No Platform found!") }
 
 @Composable
 fun DataGridWithViewModel(
-    viewModel: NifsSeaWaterInfoViewModel = viewModel { NifsSeaWaterInfoViewModel() }
-){
-    val platform = LocalPlatform.current
 
-    LaunchedEffect(key1 = viewModel){
-        viewModel.onEvent(NifsSeaWaterInfoViewModel.Event.Refresh)
+){
+
+    val platform = LocalPlatform.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val viewModel: NifsSeaWaterInfoCurrentViewModel = remember {
+        NifsSeaWaterInfoCurrentViewModel(
+            coroutineScope
+        )
     }
 
-    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(key1 = viewModel){
+        viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
+    }
+
+
     val snackbarHostState = remember { SnackbarHostState() }
 
     val reloadData :()->Unit = {
         coroutineScope.launch{
-            viewModel.onEvent(NifsSeaWaterInfoViewModel.Event.Refresh)
+            viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
         }
     }
 
     val seaWaterInfo = viewModel._seaWaterInfo.collectAsState()
+
 
     var isVisible by remember { mutableStateOf(false) }
     val columnNames = remember { mutableStateOf(emptyList<String>() ) }
