@@ -13,8 +13,11 @@ The project consists of four main modules:
 ## Key Features
 
 • Real-time Data Collection: Automated fetching of public data (JSON/XML).
+
 • RESTful Service: Robust API backend providing structured data to various consumers.
+
 • Multiplatform UI: Single codebase for mobile and desktop environments.
+
 • Data Visualization: High-performance data grids and interactive charts.
 
 
@@ -54,19 +57,31 @@ maven {
 ```
 
 2. Environment Variables
+
    Ensure you have the following keys set in your system:
+
    • GPR_USER: Your GitHub ID.
+
    • GPR_KEY: A GitHub PAT with read:packages permission.
+
 3. Running the Project
+
    • Run Backend Server: ./gradlew :server:run
+
    • Run Android App: ./gradlew :composeApp:installDebug
+
    • Run Desktop App: ./gradlew :composeApp:run
 
 ## Tech Stack
 • Language: Kotlin 2.x
+
 • UI Framework: Compose Multiplatform
+
 • Backend: Ktor
+
 • Concurrency: Kotlin Coroutines & Flow
+
 • Build Tool: Gradle (Kotlin DSL)
+
 
 Created for demonstrating Public Data integration with Kotlin Multiplatform.
