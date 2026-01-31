@@ -58,7 +58,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
             implementation(libs.un7datagrid)
-
+            implementation(libs.koalaplot.core)
             implementation(projects.shared)
         }
         commonTest.dependencies {

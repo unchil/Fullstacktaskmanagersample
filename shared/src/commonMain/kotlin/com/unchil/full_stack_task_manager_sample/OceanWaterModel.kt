@@ -3,6 +3,8 @@ package com.unchil.full_stack_task_manager_sample
 
 import kotlinx.serialization.Serializable
 
+
+
 enum class DATA_DIVISION {
     oneday, grid, current, statistics, mof_oneday
 }

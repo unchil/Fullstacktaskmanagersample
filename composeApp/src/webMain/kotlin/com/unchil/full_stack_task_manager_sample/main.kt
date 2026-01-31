@@ -8,7 +8,7 @@ import androidx.compose.ui.window.ComposeViewport
 fun main() {
     ComposeViewport {
         CompositionLocalProvider( LocalPlatform provides getPlatform() ) {
-            DataGridWithViewModel()
+            OceanWaterInfoBarChart()
         }
     }
 }
