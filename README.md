@@ -38,12 +38,12 @@ The project consists of four main modules:
 
 This project leverages several powerful libraries to handle data and UI:
 
-| Library | Role | Description | 
-| :--- | :--- | :--- | 
-| Compose DataGrid | UI Component | unchil/ComposeDataGrid - Used for displaying large-scale collected data in a highly customizable table format. | 
-| KoalaPlot | Visualization | A Compose Multiplatform charting library used to render statistical data (Line, Bar, Pie charts). | 
-| Ktor | Networking | Handles HTTP requests for both the collection server (fetching) and the client app (consuming). | 
-| KotlinX Serialization| Parsing | Multiplatform JSON/XML serialization/deserialization for seamless data flow. | 
+| Library | Role | Description | Url |
+| :--- | :--- | :--- | :--- |
+| Compose DataGrid | UI Component | unchil/ComposeDataGrid - Used for displaying large-scale collected data in a highly customizable table format. | https://unchil.github.io/ComposeDataGrid/ |
+| KoalaPlot | Visualization | A Compose Multiplatform charting library used to render statistical data (Line, Bar, Pie charts). | https://koalaplot.github.io/ | 
+| Ktor | Networking | Handles HTTP requests for both the collection server (fetching) and the client app (consuming). | https://ktor.io/ |
+| Exposed| Kotlin SQL database library  | a lightweight ORM (using DAO) and type-safe SQL (using DSL). | https://www.jetbrains.com/help/exposed/home.html |
 
 
 ## Screenshots
