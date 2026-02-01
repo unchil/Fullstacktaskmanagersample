@@ -31,8 +31,6 @@ import kotlinx.coroutines.delay
 fun OceanWaterInfoBarChart(){
 
     val coroutineScope = rememberCoroutineScope()
-    var isVisible by remember { mutableStateOf(false) }
-
 
     val viewModel: NifsSeaWaterInfoCurrentViewModel = remember {
         NifsSeaWaterInfoCurrentViewModel(  coroutineScope  )
@@ -40,13 +38,14 @@ fun OceanWaterInfoBarChart(){
 
     LaunchedEffect(key1 = viewModel){
         viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
-
         while(true){
             delay(10 * 60 * 1000L).let{
                 viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
             }
         }
     }
+
+    var isVisible by remember { mutableStateOf(false) }
 
     val seaWaterInfo = viewModel._seaWaterInfo.collectAsState()
 
@@ -58,24 +57,25 @@ fun OceanWaterInfoBarChart(){
     val range = remember { mutableStateOf(0f..0f)}
 
     LaunchedEffect(seaWaterInfo.value){
+
         isVisible = seaWaterInfo.value.isNotEmpty()
+
         if(isVisible){
+            val legendTitle = "Observatory"
             data.value = seaWaterInfo.value.toBarChartMap()
             entries.value = data.value["entries"] as List<String>
             xValue.value = entries.value
             values.value = data.value["values"] as List<Float>
-
             val yMax = values.value.maxBy { it }
             range.value = 0f..(yMax + (yMax * 0.1f) )
-
 
             chartLayout.value = LayoutData(
                 type = ChartType.VerticalBar,
                 category =  xValue.value,
                 layout = TitleConfig(true, "Recent Surface Sea Temperature"),
-                legend = LegendConfig(true, true, "Observatory"),
+                legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig(
-                    "Observatory",
+                    legendTitle,
                     range = range.value,
                     //   model = FloatLinearAxisModel( 0.5f..(rawData.value.size.toFloat() + 0.5f))
                     model = CategoryAxisModel(xValue.value),
@@ -87,25 +87,22 @@ fun OceanWaterInfoBarChart(){
                     model = FloatLinearAxisModel(range.value)
                 ),
                 size = SizeConfig(height = 400.dp),
-                caption = CaptionConfig(true, "from https://www.nifs.go.kr/openApi/actionOpenapiInfoList.do#fnContentsView"),
+                caption = CaptionConfig(true,
+                    "from https://www.nifs.go.kr/openApi/actionOpenapiInfoList.do#fnContentsView"
+                ),
             )
         }
     }
 
     Column (modifier = paddingMod) {
-
         if (isVisible) {
-
             ComposePlot(
                 layout = chartLayout.value,
                 data = values.value,
                 xValues = xValue.value,
                 entries = entries.value
             )
-
-
         }
-
     }
 
 

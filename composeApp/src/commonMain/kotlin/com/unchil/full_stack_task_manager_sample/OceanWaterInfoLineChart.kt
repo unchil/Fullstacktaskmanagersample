@@ -25,7 +25,7 @@ import com.unchil.full_stack_task_manager_sample.chart.ComposePlot
 import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
-import com.unchil.full_stack_task_manager_sample.chart.toLineData
+import com.unchil.full_stack_task_manager_sample.chart.toLineMap
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
@@ -35,6 +35,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun OceanWaterInfoLineChart(){
+
     val coroutineScope = rememberCoroutineScope()
 
     val viewModel: NifsSeaWaterInfoViewModel = remember {
@@ -50,10 +51,10 @@ fun OceanWaterInfoLineChart(){
         }
     }
 
-    val seaWaterInfo = viewModel._seaWaterInfo.collectAsState()
     var isVisible by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(SEA_AREA.GRU_NAME.entries[0]) }
 
+    val seaWaterInfo = viewModel._seaWaterInfo.collectAsState()
 
     val entries = remember { mutableStateOf(emptyList<String>() ) }
     val xValue = remember { mutableStateOf(emptyList<String>()) }
@@ -62,17 +63,17 @@ fun OceanWaterInfoLineChart(){
     val range = remember { mutableStateOf(0f..0f)}
 
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
+
         isVisible = seaWaterInfo.value.isNotEmpty()
+
         if(isVisible) {
-            val data = seaWaterInfo.value.toLineData(selectedOption.gru_nam())
 
             val legendTitle = "Observatory"
+            val data = seaWaterInfo.value.toLineMap(selectedOption.gru_nam())
             entries.value = data["entries"] as List<String>
             xValue.value = data["xValue" ] as List<String>
             rawData.value = data["values" ] as Map<String, List<Float>>
-
             val max = rawData.value.maxOf { it.value.maxOf { it } }
-
             range.value =  0f..( max + (max * 0.1f) )
 
             chartLayout.value = LayoutData(
@@ -88,16 +89,16 @@ fun OceanWaterInfoLineChart(){
                     "Water Temperature °C",
                     model = FloatLinearAxisModel(range.value)
                 ),
-                caption = CaptionConfig(true, "from https://www.nifs.go.kr/openApi/actionOpenapiInfoList.do#fnContentsView"),
+                caption = CaptionConfig(true,
+                    "from https://www.nifs.go.kr/openApi/actionOpenapiInfoList.do#fnContentsView"
+                ),
             )
 
         }
     }
 
     Column (modifier = paddingMod) {
-
         if (isVisible) {
-
             Row {
                 SEA_AREA.GRU_NAME.entries.forEach { entrie ->
                     Row(
@@ -120,7 +121,6 @@ fun OceanWaterInfoLineChart(){
                     }
                 }
             }
-
             ComposePlot(
                 layout = chartLayout.value,
                 data = rawData.value,
@@ -129,8 +129,6 @@ fun OceanWaterInfoLineChart(){
             )
 
         }
-
-
     }
 
 

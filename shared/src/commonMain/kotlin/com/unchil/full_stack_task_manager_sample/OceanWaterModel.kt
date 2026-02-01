@@ -154,7 +154,7 @@ fun SeawaterInformationByObservationPoint.toGridData():List<Any?>{
         "3" -> "Deep"
         else -> ""
     })
-    data.add(this.wtr_tmp)
+    data.add( if(this.wtr_tmp.isBlank() ) 0f else  this.wtr_tmp.toFloat())
     data.add(this.lon)
     data.add(this.lat)
     return data

@@ -6,14 +6,13 @@ import com.unchil.full_stack_task_manager_sample.makeGridColumns
 import com.unchil.full_stack_task_manager_sample.toGridData
 import com.unchil.un7datagrid.toMap
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
 import kotlin.collections.toMap
 
 @OptIn(FormatStringsInDatetimeFormats::class)
-fun List<*>.toLineData(gruName: String): Map<String, Any> {
+fun List<*>.toLineMap(gruName: String): Map<String, Any> {
     val inputFormat = LocalDateTime.Format { byUnicodePattern("yyyy-MM-dd HH:mm:ss") }
     val outputFormat = LocalDateTime.Format { byUnicodePattern("yy/MM/dd HH:mm") }
 

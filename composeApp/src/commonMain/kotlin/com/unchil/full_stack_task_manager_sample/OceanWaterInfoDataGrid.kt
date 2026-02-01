@@ -48,11 +48,9 @@ val LocalPlatform = compositionLocalOf<Platform> { error("No Platform found!") }
 @Composable
 fun OceanWaterInfoDataGrid(){
 
-
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var isVisible by remember { mutableStateOf(false) }
-    val gridData = remember { mutableStateOf(mapOf<String, List<Any?>>() ) }
 
     val viewModel: NifsSeaWaterInfoCurrentViewModel = remember {
         NifsSeaWaterInfoCurrentViewModel(  coroutineScope  )
@@ -60,7 +58,6 @@ fun OceanWaterInfoDataGrid(){
 
     LaunchedEffect(key1 = viewModel){
         viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
-
         while(true){
             delay(10 * 60 * 1000L).let{
                 viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
@@ -76,6 +73,8 @@ fun OceanWaterInfoDataGrid(){
 
     val seaWaterInfo = viewModel._seaWaterInfo.collectAsState()
 
+    val gridData = remember { mutableStateOf(mapOf<String, List<Any?>>() ) }
+
     LaunchedEffect(seaWaterInfo.value){
         isVisible = seaWaterInfo.value.isNotEmpty()
         if(isVisible){
@@ -90,9 +89,8 @@ fun OceanWaterInfoDataGrid(){
                     .background(MaterialTheme.colorScheme.background),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Text(
-                    "Recent Surface Sea Temperature Data",
+                    "Recent Sea Temperature Data",
                     modifier = Modifier.padding(vertical = 6.dp),
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 20.sp,
@@ -102,20 +100,26 @@ fun OceanWaterInfoDataGrid(){
                 if (isVisible) {
                     Un7KCMPDataGrid(
                         gridData.value,
-                        Un7KCMPDataGridConfig(gridHeight = 500.dp),
+                     //   Un7KCMPDataGridConfig(gridHeight = 500.dp),
                         onClick = { rowsData ->
+                            /*
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     message = "Selected Rows : ${rowsData}"
                                 )
                             }
+
+                             */
                         },
                         onLongClick = { rowsData ->
+                            /*
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     message = "Selected Rows : ${rowsData}"
                                 )
                             }
+
+                             */
                         },
                     )
 
@@ -129,7 +133,6 @@ fun OceanWaterInfoDataGrid(){
                     )
                 }
 
-
             }//--- Column
 
             SnackbarHost(
@@ -138,7 +141,6 @@ fun OceanWaterInfoDataGrid(){
             )
 
         }
-
 
     }
 }
