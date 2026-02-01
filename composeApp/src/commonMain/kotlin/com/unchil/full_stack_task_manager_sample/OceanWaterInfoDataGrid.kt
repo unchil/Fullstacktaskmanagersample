@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -35,6 +37,7 @@ import com.unchil.full_stack_task_manager_sample.theme.AppTheme
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
 import com.unchil.un7datagrid.Un7KCMPDataGrid
+import com.unchil.un7datagrid.Un7KCMPDataGridConfig
 import com.unchil.un7datagrid.toMap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -85,7 +88,6 @@ fun OceanWaterInfoDataGrid(){
             Column(
                 modifier = Modifier.fillMaxSize()
                     .background(MaterialTheme.colorScheme.background),
-                //   .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -100,7 +102,7 @@ fun OceanWaterInfoDataGrid(){
                 if (isVisible) {
                     Un7KCMPDataGrid(
                         gridData.value,
-                        modifier = Modifier.height(360.dp),
+                        Un7KCMPDataGridConfig(gridHeight = 500.dp),
                         onClick = { rowsData ->
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(

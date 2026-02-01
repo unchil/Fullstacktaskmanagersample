@@ -58,10 +58,7 @@ fun OceanWaterInfo(){
 
     AppTheme(enableDarkMode=false) {
 
-            BoxWithConstraints(
-                modifier = Modifier.fillMaxSize()
-                    .safeDrawingPadding() // Android/iOS의 Safe Area(상태바 등)를 자동으로 계산하여 패딩 추가
-            ) {
+
 
                 Surface(
                     shadowElevation = 2.dp,
@@ -92,10 +89,12 @@ fun OceanWaterInfo(){
                     HorizontalDivider(modifier = Modifier.padding(10.dp))
                     OceanWaterInfoLineChart()
 
+
+
                 }
 
 
-            } //--- BoxWithConstraints
+
 
         }
     }
