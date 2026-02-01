@@ -131,24 +131,25 @@ fun SeaWaterInformation.toGridData():List<Any?>{
 fun SeawaterInformationByObservationPoint.makeGridColumns():List<String>{
     val columns = mutableListOf<String>()
     columns.add("Collection Time")
-    columns.add("Sea Area")
-    columns.add("Observation Station Code")
-    columns.add("Observation Station Name")
-    columns.add("Observation Layer")
-    columns.add("Water Temperature")
+    columns.add("SeaArea")
+    columns.add("ObservatoryCode")
+    columns.add("Observatory")
+    columns.add("ObservationLayer")
+    columns.add("WaterTemperature")
     columns.add("Longitude")
     columns.add("Latitude")
     return columns
 }
 
 fun SeawaterInformationByObservationPoint.toGridData():List<Any?>{
+
     val data = mutableListOf<Any?>()
     data.add(this.obs_datetime)
     data.add(this.gru_nam)
     data.add(this.sta_cde)
     data.add(this.sta_nam_kor)
     data.add(when(this.obs_lay){
-        "1" -> "Superficial"
+        "1" -> "Surface"
         "2" -> "Middle"
         "3" -> "Deep"
         else -> ""

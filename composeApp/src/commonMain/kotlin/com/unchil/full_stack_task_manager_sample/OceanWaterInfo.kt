@@ -1,11 +1,15 @@
 package com.unchil.full_stack_task_manager_sample
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -41,9 +45,10 @@ import com.unchil.un7datagrid.toMap
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
+import kotlin.text.compareTo
 
 
- val padding = 8.dp
+val padding = 8.dp
  val paddingMod = Modifier.padding(padding)
 
 
@@ -51,135 +56,49 @@ import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 @Composable
 fun OceanWaterInfo(){
 
-    val coroutineScope = rememberCoroutineScope()
+    AppTheme(enableDarkMode=false) {
 
-    val viewModel: NifsSeaWaterInfoCurrentViewModel = remember {
-        NifsSeaWaterInfoCurrentViewModel(
-            coroutineScope
-        )
-    }
-
-    LaunchedEffect(key1 = viewModel){
-        viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
-    }
-    val seaWaterInfo = viewModel._seaWaterInfo.collectAsState()
-
-    val gridData = remember { mutableStateOf(mutableMapOf<String, List<Any?>>() ) }
-    val entries = remember { mutableStateOf(emptyList<String>() ) }
-    val xValue = remember { mutableStateOf(emptyList<String>()) }
-    val rawData = remember { mutableStateOf(emptyList<Float>() ) }
-    val chartLayout = remember { mutableStateOf(LayoutData() )}
-    val range = remember { mutableStateOf(0f..0f)}
-
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(seaWaterInfo.value){
-
-        isVisible = seaWaterInfo.value.isNotEmpty()
-        if(isVisible){
-            val columnNames  = seaWaterInfo.value.first().makeGridColumns()
-            val data = seaWaterInfo.value.filter{ it.obs_lay == "1"}.map {
-                it.toGridData()
-            }
-            gridData.value = Pair(columnNames, data).toMap()
-            entries.value = gridData.value["Observation Station Name"] as List<String>
-            xValue.value = entries.value
-            rawData.value = gridData.value["Water Temperature"]?.map { it.toString().toFloat() }!!
-
-            val yMax = rawData.value.maxBy { it }
-            range.value = 0f..(yMax + (yMax * 0.1f) )
-
-
-            chartLayout.value = LayoutData(
-                type = ChartType.VerticalBar,
-                category =  xValue.value,
-                layout = TitleConfig(true, "Ocean Water Information"),
-                legend = LegendConfig(true, true, "Observatory"),
-                xAxis = AxisConfig(
-                    "Observatory",
-                    range = range.value,
-                    //   model = FloatLinearAxisModel( 0.5f..(rawData.value.size.toFloat() + 0.5f))
-                    model = CategoryAxisModel(xValue.value),
-                    style = AxisStyle(labelRotation = 45)
-                ),
-                yAxis = AxisConfig(
-                    "Water Temperature °C",
-                    range = range.value,
-                    model = FloatLinearAxisModel(range.value)
-                ),
-                size = SizeConfig(height = 400.dp),
-                caption = CaptionConfig(true, "from https://www.nifs.go.kr/openApi/actionOpenapiInfoList.do#fnContentsView"),
-            )
-        }
-    }
-
-
-
-    AppTheme(enableDarkMode=false){
-
-        Surface (
-            shadowElevation = 2.dp,
-            modifier = Modifier.padding(20.dp),
-            shape = RoundedCornerShape(6.dp)
-
-            ){
-            Column(
-                modifier = paddingMod.fillMaxSize().padding(20.dp).verticalScroll(rememberScrollState()  )
-                    .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-                    .safeContentPadding()
-                ,
-                horizontalAlignment = Alignment.CenterHorizontally,
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxSize()
+                    .safeDrawingPadding() // Android/iOS의 Safe Area(상태바 등)를 자동으로 계산하여 패딩 추가
             ) {
 
-                Text(
-                    "Korea Ocean Water Information",
-                    modifier = Modifier.padding( vertical = 20.dp),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+                Surface(
+                    shadowElevation = 2.dp,
+                    modifier = Modifier.padding(10.dp),
+                    shape = RoundedCornerShape(6.dp)
+
+                ) {
 
 
-
-                if (isVisible) {
-
+                Column(
+                    modifier = paddingMod.fillMaxSize().padding(0.dp)
+                        .verticalScroll(rememberScrollState())
+                        .safeContentPadding(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
 
                     Text(
-                        "Un7-KCMP-DataGrid",
-                        modifier = Modifier.padding( vertical = 10.dp),
+                        "Korea Ocean Water Information",
+                        modifier = Modifier.padding(vertical = 20.dp),
                         color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 18.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                     )
 
-                    Un7KCMPDataGrid(
-                        data = gridData.value,
-                        modifier = Modifier.height(400.dp)
-                    )
-
-
-
-                    HorizontalDivider(modifier = Modifier.padding(20.dp))
-
-                    ComposePlot(
-                        layout = chartLayout.value,
-                        data = rawData.value,
-                        xValues = xValue.value,
-                        entries = entries.value
-                    )
-
-                    HorizontalDivider(modifier = Modifier.padding(20.dp))
-
+                    OceanWaterInfoDataGrid()
+                    HorizontalDivider(modifier = Modifier.padding(10.dp))
+                    OceanWaterInfoBarChart()
+                    HorizontalDivider(modifier = Modifier.padding(10.dp))
                     OceanWaterInfoLineChart()
 
                 }
 
 
-            }
+            } //--- BoxWithConstraints
+
         }
-
     }
-
 
 
 }

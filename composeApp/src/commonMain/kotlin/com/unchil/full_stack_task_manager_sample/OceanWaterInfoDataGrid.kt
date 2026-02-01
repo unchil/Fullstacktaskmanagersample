@@ -1,6 +1,7 @@
 package com.unchil.full_stack_task_manager_sample
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,35 +30,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unchil.full_stack_task_manager_sample.chart.toGridDataMap
 import com.unchil.full_stack_task_manager_sample.theme.AppTheme
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
+import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
 import com.unchil.un7datagrid.Un7KCMPDataGrid
 import com.unchil.un7datagrid.toMap
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 val LocalPlatform = compositionLocalOf<Platform> { error("No Platform found!") }
 
 
 @Composable
-fun DataGridWithViewModel(
+fun OceanWaterInfoDataGrid(){
 
-){
 
-    val platform = LocalPlatform.current
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var isVisible by remember { mutableStateOf(false) }
+    val gridData = remember { mutableStateOf(mapOf<String, List<Any?>>() ) }
 
     val viewModel: NifsSeaWaterInfoCurrentViewModel = remember {
-        NifsSeaWaterInfoCurrentViewModel(
-            coroutineScope
-        )
+        NifsSeaWaterInfoCurrentViewModel(  coroutineScope  )
     }
 
     LaunchedEffect(key1 = viewModel){
         viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
+
+        while(true){
+            delay(10 * 60 * 1000L).let{
+                viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
+            }
+        }
     }
-
-
-    val snackbarHostState = remember { SnackbarHostState() }
 
     val reloadData :()->Unit = {
         coroutineScope.launch{
@@ -67,49 +73,15 @@ fun DataGridWithViewModel(
 
     val seaWaterInfo = viewModel._seaWaterInfo.collectAsState()
 
-
-    var isVisible by remember { mutableStateOf(false) }
-    val columnNames = remember { mutableStateOf(emptyList<String>() ) }
-    val data = remember { mutableStateOf(emptyList<List<Any?>>()) }
-    val gridData = remember { mutableStateOf(mutableMapOf<String, List<Any?>>() ) }
-
-
     LaunchedEffect(seaWaterInfo.value){
         isVisible = seaWaterInfo.value.isNotEmpty()
         if(isVisible){
-            columnNames.value = seaWaterInfo.value.first().makeGridColumns()
-            data.value = seaWaterInfo.value.map {
-                it.toGridData()
-            }
-
-            gridData.value = Pair(columnNames.value, data.value).toMap()
+            gridData.value = seaWaterInfo.value.toGridDataMap()
         }
     }
 
     AppTheme(enableDarkMode=false){
-        BoxWithConstraints(
-            modifier = Modifier.fillMaxSize().safeDrawingPadding() // Android/iOS의 Safe Area(상태바 등)를 자동으로 계산하여 패딩 추가
-        ) {
-            val isLandscape = maxWidth > maxHeight
-            val titleVerticalPadding = remember {  mutableStateOf(10.dp) }
-            val titleAreaHeight = remember {  mutableStateOf(24.dp + titleVerticalPadding.value*2) }
-            val modifier = when(platform.alias){
-                PlatformAlias.ANDROID -> {
-                    Modifier.width(maxWidth ).height(maxHeight - titleAreaHeight.value  )
-                }
-                PlatformAlias.IOS -> {
-                    Modifier.width(maxWidth).height(maxHeight - titleAreaHeight.value  )
-                }
-                PlatformAlias.JVM -> {
-                    Modifier.fillMaxWidth(0.95f).height(500.dp ).padding(0.dp)
-                }
-                PlatformAlias.WASM -> {
-                    Modifier.fillMaxWidth(0.95f).height(640.dp ).padding(0.dp)
-                }
-
-                PlatformAlias.JS -> TODO()
-            }
-
+        Box{
             Column(
                 modifier = Modifier.fillMaxSize()
                     .background(MaterialTheme.colorScheme.background),
@@ -118,27 +90,25 @@ fun DataGridWithViewModel(
             ) {
 
                 Text(
-                    "Korea Ocean Water Information",
-                    modifier = Modifier.padding( vertical = titleVerticalPadding.value),
+                    "Recent Surface Sea Temperature Data",
+                    modifier = Modifier.padding(vertical = 6.dp),
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
                 )
 
                 if (isVisible) {
                     Un7KCMPDataGrid(
                         gridData.value,
-                        modifier = modifier,
-                        onClick = {
-                                rowsData->
+                        modifier = Modifier.height(360.dp),
+                        onClick = { rowsData ->
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     message = "Selected Rows : ${rowsData}"
                                 )
                             }
                         },
-                        onLongClick = {
-                                rowsData->
+                        onLongClick = { rowsData ->
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     message = "Selected Rows : ${rowsData}"
@@ -157,16 +127,16 @@ fun DataGridWithViewModel(
                     )
                 }
 
-            } //--- Column
+
+            }//--- Column
 
             SnackbarHost(
                 hostState = snackbarHostState,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
 
+        }
 
 
-
-        } //--- BoxWithConstraints
     }
 }

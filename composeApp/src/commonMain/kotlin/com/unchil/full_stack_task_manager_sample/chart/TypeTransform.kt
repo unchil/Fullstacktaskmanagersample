@@ -2,11 +2,15 @@ package com.unchil.full_stack_task_manager_sample.chart
 
 
 import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservationPoint
+import com.unchil.full_stack_task_manager_sample.makeGridColumns
+import com.unchil.full_stack_task_manager_sample.toGridData
+import com.unchil.un7datagrid.toMap
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
+import kotlin.collections.toMap
 
 @OptIn(FormatStringsInDatetimeFormats::class)
 fun List<*>.toLineData(gruName: String): Map<String, Any> {
@@ -43,4 +47,30 @@ fun List<*>.toLineData(gruName: String): Map<String, Any> {
         "xValue" to xValues,
         "values" to valuesMap
     )
+}
+
+// TypeTransform.kt 또는 적절한 위치에 추가
+fun List<SeawaterInformationByObservationPoint>.toGridDataMap(): Map<String, List<Any?>> {
+    if (this.isEmpty()) return mutableMapOf()
+
+    // 첫 번째 아이템에서 컬럼 이름을 추출
+    val columns = this.first().makeGridColumns()
+    // 모든 데이터를 리스트의 리스트 형태로 변환
+    val rows = this.map { it.toGridData() }
+
+    // Pair(컬럼 리스트, 로우 리스트).toMap() 호출
+    return (columns to rows).toMap()
+}
+
+
+
+fun List<SeawaterInformationByObservationPoint>.toBarChartMap(): Map<String, List<*>?> {
+
+    val gridData = this.filter{ it.obs_lay == "1"}.toGridDataMap()
+    val entries = gridData["Observatory"] as List<*>
+    val values = gridData["WaterTemperature"]?.map {  it.toString().trim().toFloatOrNull() ?: 0f }
+
+    return mapOf("entries" to entries, "xValue" to entries, "values" to values)
+
+
 }

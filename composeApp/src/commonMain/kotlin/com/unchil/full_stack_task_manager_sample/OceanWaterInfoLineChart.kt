@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,14 +26,11 @@ import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
 import com.unchil.full_stack_task_manager_sample.chart.toLineData
-import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import kotlinx.coroutines.delay
-import kotlin.collections.get
-import kotlin.math.ceil
 
 
 @Composable
@@ -70,7 +66,6 @@ fun OceanWaterInfoLineChart(){
         if(isVisible) {
             val data = seaWaterInfo.value.toLineData(selectedOption.gru_nam())
 
-
             val legendTitle = "Observatory"
             entries.value = data["entries"] as List<String>
             xValue.value = data["xValue" ] as List<String>
@@ -80,12 +75,10 @@ fun OceanWaterInfoLineChart(){
 
             range.value =  0f..( max + (max * 0.1f) )
 
-
-
             chartLayout.value = LayoutData(
                 type = ChartType.Line,
                 category = xValue.value,
-                layout = TitleConfig(true, "Ocean Water Information"),
+                layout = TitleConfig(true, "24-hour Surface Sea Temperature"),
                 legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig("Collecting Time",
                     model = CategoryAxisModel(xValue.value),
