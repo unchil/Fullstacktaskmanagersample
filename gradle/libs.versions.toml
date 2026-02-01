@@ -31,6 +31,8 @@ serialization = "1.10.0"
 ksp = "2.1.20-1.0.31"
 secrets-gradle-plugin = "2.0.1"
 
+datetime = "0.7.1"
+
 un7datagrid = "0.2.7-3"
 koalaplotCore = "0.10.4"
 
@@ -89,6 +91,7 @@ exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed-version" }
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetime" }
 
 
 un7datagrid = { module = "com.github.unchil:un7datagrid", version.ref = "un7datagrid" }

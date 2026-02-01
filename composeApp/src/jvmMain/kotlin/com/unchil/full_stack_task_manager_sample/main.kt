@@ -23,8 +23,7 @@ fun main() = application {
         state = state,
     ) {
         CompositionLocalProvider( LocalPlatform provides getPlatform() ) {
-            //DataGridWithViewModel()
-            OceanWaterInfoBarChart()
+            OceanWaterInfo()
         }
     }
 }

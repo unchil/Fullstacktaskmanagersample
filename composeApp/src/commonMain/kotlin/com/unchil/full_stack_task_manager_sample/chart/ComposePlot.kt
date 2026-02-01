@@ -166,7 +166,7 @@ fun ComposePlot(
                 when(layout.type){
                     ChartType.Line -> {
                         val scope = this as XYGraphScope<String, Float>
-                        (data as Map<String, List<Double>>).entries.sortedBy { it.key }.forEach { (key, values) ->
+                        (data as Map<String, List<Float>>).entries.sortedBy { it.key }.forEach { (key, values) ->
                             scope.LineChart(
                                 key,
                                 values = values.mapIndexed { index, value ->
@@ -335,6 +335,7 @@ fun XYGraphScope<String, Float>.LineChart(
                 Symbol(
                     shape = CircleShape,
                     fillBrush = SolidColor(colors[key] ?: Color.Black),
+                    size = 6.dp,
                 )
             }
         },
