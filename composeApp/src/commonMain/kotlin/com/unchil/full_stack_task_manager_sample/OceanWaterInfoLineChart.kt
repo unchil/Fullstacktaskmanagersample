@@ -86,7 +86,7 @@ fun OceanWaterInfoLineChart(){
                 legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig("Collecting Time",
                     model = DoubleLinearAxisModel(xRange) as AxisModel<Any>,
-                    style = AxisStyle(labelRotation = 45)
+                    style = AxisStyle(labelRotation = 0)
                 ),
                 yAxis = AxisConfig(
                     "Water Temperature °C",

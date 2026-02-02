@@ -144,11 +144,11 @@ fun OceanWaterInfoLineChart_MOF(){
             chartLayout.value = LayoutData(
                 size = SizeConfig(height = 500.dp),
                 type = ChartType.Line,
-                layout = TitleConfig(true, "24-hour Ocean Water Information"),
+                layout = TitleConfig(true, "24-hour Ocean Water Information", description = selectedOption.desc()),
                 legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig("Collecting Time",
                     model = DoubleLinearAxisModel(xRange) as AxisModel<Any>,
-                    style = AxisStyle(labelRotation = 45),
+                    style = AxisStyle(labelRotation = 0),
 
                 ),
                 yAxis = AxisConfig(
@@ -165,6 +165,14 @@ fun OceanWaterInfoLineChart_MOF(){
 
     Column (modifier = paddingMod) {
         if (isVisible) {
+
+            ComposePlot(
+                layout = chartLayout.value,
+                data = rawData.value,
+                xValues = xValue.value,
+                entries = entries.value
+            )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -190,19 +198,6 @@ fun OceanWaterInfoLineChart_MOF(){
                     }
                 }
             }
-
-            Text(
-                text = selectedOption.desc(),
-                modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
-                textAlign = TextAlign.Center
-            )
-
-            ComposePlot(
-                layout = chartLayout.value,
-                data = rawData.value,
-                xValues = xValue.value,
-                entries = entries.value
-            )
 
         }
     }

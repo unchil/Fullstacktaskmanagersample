@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
@@ -33,8 +34,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.desc
 import io.github.koalaplot.core.ChartLayout
 import io.github.koalaplot.core.Symbol
 import io.github.koalaplot.core.bar.BarPlotGroupedPointEntry
@@ -100,7 +103,16 @@ fun ComposePlot(
             legendLocation = layout.legend.location
         ) {
 
+            Column {
 
+                if(!layout.layout.description.isNullOrBlank()){
+                    Text(
+                        text = layout.layout.description,
+                        modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                        textAlign = TextAlign.Start
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(10.dp))
+                }
 
                 XYGraph(
                     xAxisModel = when (layout.type) {
@@ -236,6 +248,10 @@ fun ComposePlot(
                 }
 
 
+            }
+
+
+
 
         } //-- ChartLayout
 
@@ -268,19 +284,19 @@ fun Legend(
 
     val modifier = when(layout.legend.location){
         LegendLocation.LEFT,LegendLocation.RIGHT -> {
-            if( (layout.size.height * 0.6f) < ( entries.size.toFloat() * defaultSize )){
-                paddingMod.height(layout.size.height * 0.6f)
+            if( (layout.size.height * 0.4f) < ( entries.size.toFloat() * defaultSize )){
+                paddingMod.height(layout.size.height * 0.4f)
                     .verticalScroll(rememberScrollState())
-                    .horizontalScroll(rememberScrollState())
+                //    .horizontalScroll(rememberScrollState())
             } else{
                 paddingMod
                     .verticalScroll(rememberScrollState())
-                    .horizontalScroll(rememberScrollState())
+                  //  .horizontalScroll(rememberScrollState())
             }
         }
         LegendLocation.TOP ,LegendLocation.BOTTOM ,LegendLocation.NONE -> {
             paddingMod
-                .verticalScroll(rememberScrollState())
+              //  .verticalScroll(rememberScrollState())
                 .horizontalScroll(rememberScrollState())
         }
     }
