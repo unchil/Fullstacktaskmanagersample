@@ -46,7 +46,8 @@ import io.github.koalaplot.core.bar.GroupedVerticalBarPlot
 import io.github.koalaplot.core.bar.VerticalBarPlot
 import io.github.koalaplot.core.bar.VerticalBarPlotEntry
 import io.github.koalaplot.core.legend.ColumnLegend
-import io.github.koalaplot.core.legend.FlowLegend
+import io.github.koalaplot.core.legend.ColumnLegend2
+import io.github.koalaplot.core.legend.FlowLegend2
 import io.github.koalaplot.core.legend.LegendLocation
 import io.github.koalaplot.core.line.LinePlot2
 import io.github.koalaplot.core.style.KoalaPlotTheme
@@ -54,8 +55,12 @@ import io.github.koalaplot.core.style.LineStyle
 import io.github.koalaplot.core.util.ExperimentalKoalaPlotApi
 import io.github.koalaplot.core.util.VerticalRotation
 import io.github.koalaplot.core.util.rotateVertically
+import io.github.koalaplot.core.xygraph.AxisContent
+import io.github.koalaplot.core.xygraph.AxisLabelScope
+import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.DefaultPoint
+import io.github.koalaplot.core.xygraph.DoubleLinearAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import io.github.koalaplot.core.xygraph.XYGraph
 import io.github.koalaplot.core.xygraph.XYGraphScope
@@ -95,113 +100,142 @@ fun ComposePlot(
             legendLocation = layout.legend.location
         ) {
 
-            XYGraph(
-                xAxisModel = when (layout.type) {
-                    ChartType.Line -> layout.xAxis.model as CategoryAxisModel<*>
-                    ChartType.VerticalBar -> layout.xAxis.model as CategoryAxisModel<*>
-                    ChartType.GroupVerticalBar -> layout.xAxis.model as CategoryAxisModel<*>
-                    ChartType.XYGraph -> layout.xAxis.model as CategoryAxisModel<*>
-                },
-                xAxisLabels = {
-                    if (layout.xAxis.isLabels) {
-                        AxisLabel(
-                            it.toString(),
-                            Modifier.padding(top = 2.dp)
-                        )
-                    }
-                },
-                xAxisStyle = rememberAxisStyle(
-                    color = layout.xAxis.style?.color ?:  KoalaPlotTheme.axis.color,
-                    majorTickSize = layout.xAxis.style?.majorTickSize ?:  KoalaPlotTheme.axis.majorTickSize,
-                    minorTickSize = layout.xAxis.style?.minorTickSize ?:  KoalaPlotTheme.axis.minorTickSize,
-                    tickPosition =  layout.xAxis.style?.tickPosition ?:  KoalaPlotTheme.axis.xyGraphTickPosition,
-                    lineWidth = layout.xAxis.style?.lineWidth ?:  KoalaPlotTheme.axis.lineThickness,
-                    labelRotation = layout.xAxis.style?.labelRotation ?:  0,
-                ),
-                xAxisTitle = {
-                    if (layout.xAxis.isTitle) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            AxisTitle(layout.xAxis.title, paddingMod)
-                        }
-                    }
-                },
-                yAxisModel = when (layout.type) {
-                    ChartType.XYGraph -> layout.yAxis.model as FloatLinearAxisModel
-                    ChartType.VerticalBar -> layout.yAxis.model as FloatLinearAxisModel
-                    ChartType.GroupVerticalBar -> layout.yAxis.model as FloatLinearAxisModel
-                    ChartType.Line -> layout.yAxis.model as FloatLinearAxisModel
-                },
-                yAxisLabels = {
-                    if (layout.yAxis.isLabels) {
-                        AxisLabel(it.toString(), Modifier.absolutePadding(right = 2.dp))
-                    }
-                },
-                yAxisStyle = rememberAxisStyle(
-                    color = layout.yAxis.style?.color ?:  KoalaPlotTheme.axis.color,
-                    majorTickSize = layout.yAxis.style?.majorTickSize ?:  KoalaPlotTheme.axis.majorTickSize,
-                    minorTickSize = layout.yAxis.style?.minorTickSize ?:  KoalaPlotTheme.axis.minorTickSize,
-                    tickPosition =  layout.yAxis.style?.tickPosition ?:  KoalaPlotTheme.axis.xyGraphTickPosition,
-                    lineWidth = layout.yAxis.style?.lineWidth ?:  KoalaPlotTheme.axis.lineThickness,
-                    labelRotation = layout.yAxis.style?.labelRotation ?:  0,
-                ),
-                yAxisTitle = {
-                    if (layout.yAxis.isTitle) {
-                        Box(
-                            modifier = Modifier.fillMaxHeight(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            AxisTitle(
-                                layout.yAxis.title,
-                                modifier = paddingMod
-                                    .rotateVertically(VerticalRotation.COUNTER_CLOCKWISE)
-                            )
-                        }
-                    }
-                },
-            ) {
 
-                when(layout.type){
-                    ChartType.Line -> {
-                        val scope = this as XYGraphScope<String, Float>
-                        (data as Map<String, List<Float>>).entries.sortedBy { it.key }.forEach { (key, values) ->
-                            scope.LineChart(
-                                key,
-                                values = values.mapIndexed { index, value ->
-                                    DefaultPoint((xValues as List<String>)[index], value.toFloat())
-                                },
+
+                XYGraph(
+                    xAxisModel = when (layout.type) {
+                        ChartType.Line -> layout.xAxis.model as DoubleLinearAxisModel
+                        ChartType.VerticalBar -> layout.xAxis.model as CategoryAxisModel<Any>
+                        ChartType.GroupVerticalBar -> layout.xAxis.model as CategoryAxisModel<Any>
+                        ChartType.XYGraph -> layout.xAxis.model as CategoryAxisModel<Any>
+                    },
+                    yAxisModel = when (layout.type) {
+                        ChartType.XYGraph -> layout.yAxis.model as FloatLinearAxisModel
+                        ChartType.VerticalBar -> layout.yAxis.model as FloatLinearAxisModel
+                        ChartType.GroupVerticalBar -> layout.yAxis.model as FloatLinearAxisModel
+                        ChartType.Line -> layout.yAxis.model as FloatLinearAxisModel
+                    },
+                    xAxisContent = AxisContent(
+                        labels = {
+                            if (layout.xAxis.isLabels) {
+                                when (layout.type) {
+                                    ChartType.XYGraph, ChartType.VerticalBar, ChartType.GroupVerticalBar -> {
+                                        AxisLabel(it.toString(), Modifier.padding(top = 2.dp))
+                                    }
+                                    ChartType.Line -> {
+                                        AxisLabel(formatLongToDateTime(it), Modifier.padding(top = 2.dp))
+                                    }
+                                }
+
+
+                            }
+                        },
+                        title = {
+                            if (layout.xAxis.isTitle) {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    AxisTitle(layout.xAxis.title, paddingMod)
+                                }
+                            }
+                        },
+                        style = AxisStyle(
+                            color = layout.xAxis.style?.color ?: KoalaPlotTheme.axis.color,
+                            majorTickSize = layout.xAxis.style?.majorTickSize
+                                ?: KoalaPlotTheme.axis.majorTickSize,
+                            minorTickSize = layout.xAxis.style?.minorTickSize
+                                ?: KoalaPlotTheme.axis.minorTickSize,
+                            tickPosition = layout.xAxis.style?.tickPosition
+                                ?: KoalaPlotTheme.axis.xyGraphTickPosition,
+                            lineWidth = layout.xAxis.style?.lineWidth
+                                ?: KoalaPlotTheme.axis.lineThickness,
+                            labelRotation = layout.xAxis.style?.labelRotation ?: 0,
+                        ),
+                    ),
+                    yAxisContent = AxisContent(
+                        labels = {
+                            if (layout.yAxis.isLabels) {
+                                AxisLabel(it.toString(), Modifier.absolutePadding(right = 2.dp))
+                            }
+                        },
+                        title = {
+                            if (layout.yAxis.isTitle) {
+                                Box(
+                                    modifier = Modifier.fillMaxHeight(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    AxisTitle(
+                                        layout.yAxis.title,
+                                        modifier = paddingMod
+                                            .rotateVertically(VerticalRotation.COUNTER_CLOCKWISE)
+                                    )
+                                }
+                            }
+                        },
+                        style = AxisStyle(
+                            color = layout.yAxis.style?.color ?: KoalaPlotTheme.axis.color,
+                            majorTickSize = layout.yAxis.style?.majorTickSize
+                                ?: KoalaPlotTheme.axis.majorTickSize,
+                            minorTickSize = layout.yAxis.style?.minorTickSize
+                                ?: KoalaPlotTheme.axis.minorTickSize,
+                            tickPosition = layout.yAxis.style?.tickPosition
+                                ?: KoalaPlotTheme.axis.xyGraphTickPosition,
+                            lineWidth = layout.yAxis.style?.lineWidth
+                                ?: KoalaPlotTheme.axis.lineThickness,
+                            labelRotation = layout.yAxis.style?.labelRotation ?: 0,
+                        )
+                    ),
+                ) {
+                    when (layout.type) {
+                        ChartType.Line -> {
+
+
+                            val scope = this as XYGraphScope<Double, Float>
+                            (data as Map<String, List<Float>>).entries.sortedBy { it.key }
+                                .forEach { (key, values) ->
+                                    scope.LineChart(
+                                        key,
+                                        values = values.mapIndexed { index, value ->
+                                            DefaultPoint(
+                                                (xValues as List<Double>)[index],
+                                                value.toFloat()
+                                            )
+                                        },
+                                        layout.tooltips.isTooltips,
+                                        colors
+                                    )
+                                }
+
+                        }
+
+                        ChartType.VerticalBar -> {
+                            val scope = this as XYGraphScope<String, Float>
+                            scope.VerticalBarChart(
+                                (data as List<Float>),
+                                (xValues as List<String>),
                                 layout.tooltips.isTooltips,
-                                colors
+                                colors,
+                                layout.barConf.widthWeight
                             )
                         }
-                    }
-                    ChartType.VerticalBar -> {
-                        val scope = this as XYGraphScope<String, Float>
-                        scope.VerticalBarChart(
-                            (data as List<Float>),
-                            (xValues as List<String>),
-                            layout.tooltips.isTooltips,
-                            colors,
-                            layout.barConf.widthWeight
-                        )
-                    }
-                    ChartType.GroupVerticalBar -> {
-                        val scope = this as XYGraphScope<Int, Float>
-                        scope.GroupVerticalBarChart(
-                            (data as Map<String,List<Int>>),
-                            (xValues as List<Int>),
-                            layout.tooltips.isTooltips,
-                            colors,
-                        )
+
+                        ChartType.GroupVerticalBar -> {
+                            val scope = this as XYGraphScope<Int, Float>
+                            scope.GroupVerticalBarChart(
+                                (data as Map<String, List<Int>>),
+                                (xValues as List<Int>),
+                                layout.tooltips.isTooltips,
+                                colors,
+                            )
+                        }
+
+                        ChartType.XYGraph -> TODO()
                     }
 
-                    ChartType.XYGraph -> TODO()
                 }
 
 
-            } //-- XYGraph
 
         } //-- ChartLayout
 
@@ -267,8 +301,10 @@ fun Legend(
             Box(modifier = modifier) {
                 when (layout.legend.location) {
                     LegendLocation.LEFT, LegendLocation.RIGHT, LegendLocation.NONE -> {
-                        ColumnLegend(
-                            itemCount = entries.size,
+
+                        ColumnLegend2(
+                            itemCount  = entries.size,
+                            modifier = paddingMod,
                             symbol = { i ->
                                 Symbol(
                                     modifier = Modifier.size(padding),
@@ -278,12 +314,12 @@ fun Legend(
                             label = { i ->
                                 Text(entries[i])
                             },
-                            modifier = paddingMod,
+                            value = {  },
                         )
                     }
 
                     LegendLocation.TOP, LegendLocation.BOTTOM -> {
-                        FlowLegend(
+                        FlowLegend2(
                             itemCount = entries.size,
                             symbol = { i ->
                                 Symbol(
@@ -296,6 +332,9 @@ fun Legend(
                             },
                             modifier = paddingMod,
                         )
+
+
+
 
                     }
 
@@ -310,9 +349,9 @@ fun Legend(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalKoalaPlotApi::class)
 @Composable
-fun XYGraphScope<String, Float>.LineChart(
+fun XYGraphScope<Double, Float>.LineChart(
     key: String,
-    values: List<DefaultPoint<String, Float>>,
+    values: List<DefaultPoint<Double, Float>>,
     usableTooltips: Boolean,
     colors: Map<String, Color>
 ) {
@@ -327,7 +366,7 @@ fun XYGraphScope<String, Float>.LineChart(
                     TooltipAnchorPosition.Above),
                 tooltip = {
                     if (usableTooltips) {
-                        PlainTooltip { Text("${key}\n${point.x}\n${ point.y}") }
+                        PlainTooltip { Text("${key}\n${formatLongToDateTime(point.x)}\n${ point.y}") }
                     }
                 },
                 state = rememberTooltipState(),

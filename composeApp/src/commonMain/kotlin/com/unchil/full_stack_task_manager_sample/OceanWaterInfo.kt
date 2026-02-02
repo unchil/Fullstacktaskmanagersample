@@ -36,7 +36,7 @@ fun OceanWaterInfo(){
         ) {
 
             Column(
-                modifier = paddingMod.fillMaxSize().padding(0.dp)
+                modifier = paddingMod.fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .safeContentPadding(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,7 +55,8 @@ fun OceanWaterInfo(){
                 OceanWaterInfoBarChart()
                 HorizontalDivider(modifier = Modifier.padding(10.dp))
                 OceanWaterInfoLineChart()
-
+                HorizontalDivider(modifier = Modifier.padding(10.dp))
+                OceanWaterInfoLineChart_MOF()
             }
 
         }

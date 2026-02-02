@@ -124,7 +124,7 @@ fun OceanWaterInfoDataGrid(){
                     )
 
                     Text(
-                        "from https://www.nifs.go.kr/openApi/actionOpenapiInfoList.do#fnContentsView",
+                        "from https://www.nifs.go.kr (National Institute of Fisheries Science)",
                         modifier = Modifier.fillMaxWidth().padding(end = 40.dp),
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 10.sp,

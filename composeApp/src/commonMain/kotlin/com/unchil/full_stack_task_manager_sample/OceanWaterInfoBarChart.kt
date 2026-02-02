@@ -1,7 +1,6 @@
 package com.unchil.full_stack_task_manager_sample
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,8 +19,8 @@ import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.SizeConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
 import com.unchil.full_stack_task_manager_sample.chart.toBarChartMap
-import com.unchil.full_stack_task_manager_sample.chart.toGridDataMap
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
+import io.github.koalaplot.core.xygraph.AxisModel
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
@@ -71,8 +70,7 @@ fun OceanWaterInfoBarChart(){
 
             chartLayout.value = LayoutData(
                 type = ChartType.VerticalBar,
-                category =  xValue.value,
-                layout = TitleConfig(true, "Recent Surface Sea Temperature"),
+                layout = TitleConfig(true, "${seaWaterInfo.value.first().obs_datetime}  Surface Temperature"),
                 legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig(
                     legendTitle,
@@ -84,11 +82,11 @@ fun OceanWaterInfoBarChart(){
                 yAxis = AxisConfig(
                     "Water Temperature °C",
                     range = range.value,
-                    model = FloatLinearAxisModel(range.value)
+                    model = FloatLinearAxisModel(range.value) as AxisModel<Any>
                 ),
                 size = SizeConfig(height = 400.dp),
                 caption = CaptionConfig(true,
-                    "from https://www.nifs.go.kr/openApi/actionOpenapiInfoList.do#fnContentsView"
+                    "from https://www.nifs.go.kr (National Institute of Fisheries Science)"
                 ),
             )
         }
