@@ -70,6 +70,12 @@ fun OceanWaterInfoLineChart_MOF(){
     val chartLayout = remember { mutableStateOf(LayoutData() )}
     val range = remember { mutableStateOf(0f..0f)}
 
+    val maxTurbidity = remember { 500f}
+    val minElectricalConductivity = remember { 20f}
+    val minDissolvedOxygen = remember { 7f }
+    val minSalinity = remember { 15f }
+    val minHydrogenIonConcentration = remember { 6f }
+
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
 
         isVisible = seaWaterInfo.value.isNotEmpty()
@@ -84,16 +90,52 @@ fun OceanWaterInfoLineChart_MOF(){
 
 
             val min = when(selectedOption){
-                WATER_QUALITY.QualityType.rtmWtchWtem -> 0f
-                WATER_QUALITY.QualityType.rtmWqCndctv -> 10f
-                WATER_QUALITY.QualityType.ph -> 7f
-                WATER_QUALITY.QualityType.rtmWqDoxn -> 0f
-                WATER_QUALITY.QualityType.rtmWqTu -> 0f
-                WATER_QUALITY.QualityType.rtmWqChpla -> 0f
-                WATER_QUALITY.QualityType.rtmWqSlnty -> 6f
+                WATER_QUALITY.QualityType.rtmWtchWtem -> rawData.value.minOf { it.value.minOf { it } }
+                WATER_QUALITY.QualityType.rtmWqCndctv -> {
+                    if( rawData.value.minOf { it.value.minOf { it } } < minElectricalConductivity) {
+                        minElectricalConductivity
+                    } else {
+                        rawData.value.minOf { it.value.minOf { it } }
+                    }
+                }
+                WATER_QUALITY.QualityType.ph -> {
+                    if( rawData.value.minOf { it.value.minOf { it } } < minHydrogenIonConcentration) {
+                        minHydrogenIonConcentration
+                    } else {
+                        rawData.value.minOf { it.value.minOf { it } }
+                    }
+                }
+                WATER_QUALITY.QualityType.rtmWqDoxn -> {
+                    if( rawData.value.minOf { it.value.minOf { it } } < minDissolvedOxygen) {
+                        minDissolvedOxygen
+                    } else {
+                        rawData.value.minOf { it.value.minOf { it } }
+                    }
+                }
+                WATER_QUALITY.QualityType.rtmWqTu -> rawData.value.minOf { it.value.minOf { it } }
+                WATER_QUALITY.QualityType.rtmWqChpla -> rawData.value.minOf { it.value.minOf { it } }
+                WATER_QUALITY.QualityType.rtmWqSlnty -> {
+                    if( rawData.value.minOf { it.value.minOf { it } } < minSalinity) {
+                        minSalinity
+                    } else {
+                        rawData.value.minOf { it.value.minOf { it } }
+                    }
+                }
             }
 
-            val max = rawData.value.maxOf { it.value.maxOf { it } }
+            val max = when(selectedOption){
+                WATER_QUALITY.QualityType.rtmWqTu -> {
+                    if( rawData.value.maxOf { it.value.maxOf { it } } > maxTurbidity) {
+                        maxTurbidity
+                    } else {
+                        rawData.value.maxOf { it.value.maxOf { it } }
+                    }
+                }
+                else -> {
+                    rawData.value.maxOf { it.value.maxOf { it } }
+                }
+            }
+
             range.value =  min..( max + (max * 0.1f) )
 
 

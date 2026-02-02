@@ -94,21 +94,13 @@ fun List<*>.toMofLineMap(qualityType: WATER_QUALITY.QualityType):Map<String, Any
 
                 // 1. 현재 시간에 데이터가 있으면 사용
                 // 2. 없으면 timeValuePairs(리스트)에서 현재 time보다 이전인 것 중 가장 늦은 시간의 값을 가져옴
-                val value = timeMap[time] ?: timeValuePairs
+                timeMap[time] ?: timeValuePairs
                     .filter { it.first < time }
                     .maxByOrNull { it.first }?.second
                 ?: 0f // 이전 데이터도 전혀 없으면 0f
 
 
-                when(qualityType){
-                    WATER_QUALITY.QualityType.rtmWtchWtem -> if (value < 0f) 0f else value
-                    WATER_QUALITY.QualityType.rtmWqCndctv -> if (value < 10f) 10f else value
-                    WATER_QUALITY.QualityType.ph -> if (value < 7f) 7f else value
-                    WATER_QUALITY.QualityType.rtmWqDoxn -> if (value < 0f) 0f else value
-                    WATER_QUALITY.QualityType.rtmWqTu ->  value
-                    WATER_QUALITY.QualityType.rtmWqChpla -> if (value< 0f) 0f else value
-                    WATER_QUALITY.QualityType.rtmWqSlnty -> if (value < 6f) 6f else value
-                }
+
             }
         }
 
