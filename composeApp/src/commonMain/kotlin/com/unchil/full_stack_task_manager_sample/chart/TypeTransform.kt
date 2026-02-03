@@ -217,9 +217,9 @@ fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap():Map<String, List<
             val n = temps.size
             if (n == 0) return mapOf()
             // 사분위수 계산 (단순 인덱스 방식)
-            val q1 = temps[n / 4]
-            val median = temps[n / 2]
-            val q3 = temps[n * 3 / 4]
+            val q1 = temps[n / 4] // 25% 지점인 1사분위수(Q1)
+            val median = temps[n / 2] // 50% 지점인 중앙값(Q2)
+            val q3 = temps[n * 3 / 4] // 75% 지점인 3사분위수(Q3)
 
             // 이상치(Outlier) 계산 로직
             val iqr = q3 - q1

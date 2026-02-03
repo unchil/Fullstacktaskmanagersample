@@ -47,6 +47,7 @@ import io.github.koalaplot.core.ChartLayout
 import io.github.koalaplot.core.Symbol
 import io.github.koalaplot.core.bar.BarPlotGroupedPointEntry
 import io.github.koalaplot.core.bar.BarPosition
+import io.github.koalaplot.core.bar.BarScope
 import io.github.koalaplot.core.bar.DefaultBar
 import io.github.koalaplot.core.bar.DefaultBarPosition
 import io.github.koalaplot.core.bar.DefaultVerticalBarPlotEntry
@@ -219,7 +220,12 @@ fun ComposePlot(
 
                         ChartType.BoxPlotChart -> {
                             val scope = this as XYGraphScope<String, Float>
-                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors,layout.barConf.widthWeight  )
+
+                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors , BoxPlotRange.Q1_Q3)
+                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.MIN_MAX )
+                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.MIN )
+                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.MAX)
+                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.Q2)
                         }
 
 
@@ -358,43 +364,122 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
     xValues:Any,
     usableTooltips: Boolean,
     colors: Map<String, Color>,
-    barWidth: Float = 0.5f
+    range:BoxPlotRange
 ) {
     val data = (data as List<SeaWaterBoxPlotStat>)
     val xValues = (xValues as List<String>)
 
-    val values: List<VerticalBarPlotEntry<String, Float>> = buildList {
-        data.forEachIndexed { index, seaWaterBoxPlotStat ->
-            add(
-                DefaultVerticalBarPlotEntry(
-
-                    xValues[index],
-                    DefaultBarPosition(seaWaterBoxPlotStat.q1, seaWaterBoxPlotStat.q3)
-                )
-            )
-        }
+    val barWidth = when(range){
+        BoxPlotRange.Q1_Q3 -> 0.5f
+        BoxPlotRange.MIN_MAX  -> 0.05f
+        BoxPlotRange.MIN, BoxPlotRange.MAX -> 0.2f
+        BoxPlotRange.Q2 -> 0.4f
     }
+
+    val values : List<VerticalBarPlotEntry<String, Float>> = when(range){
+            BoxPlotRange.Q1_Q3 -> {
+                buildList {
+                    data.forEachIndexed { index, seaWaterBoxPlotStat ->
+                        add(
+                            DefaultVerticalBarPlotEntry(
+
+                                xValues[index],
+                                DefaultBarPosition(seaWaterBoxPlotStat.q1, seaWaterBoxPlotStat.q3)
+                            )
+                        )
+                    }
+                }
+            }
+            BoxPlotRange.MIN_MAX -> {
+                buildList {
+                    data.forEachIndexed { index, seaWaterBoxPlotStat ->
+                        add(
+                            DefaultVerticalBarPlotEntry(
+
+                                xValues[index],
+                                DefaultBarPosition(seaWaterBoxPlotStat.min, seaWaterBoxPlotStat.max )
+                            )
+                        )
+                    }
+                }
+            }
+         BoxPlotRange.MIN -> {
+             buildList {
+                 data.forEachIndexed { index, seaWaterBoxPlotStat ->
+                     add(
+                         DefaultVerticalBarPlotEntry(
+
+                             xValues[index],
+                             DefaultBarPosition(seaWaterBoxPlotStat.min, seaWaterBoxPlotStat.min + 0.05f)
+                         )
+                     )
+                 }
+             }
+         }
+         BoxPlotRange.MAX -> {
+             buildList {
+                 data.forEachIndexed { index, seaWaterBoxPlotStat ->
+                     add(
+                         DefaultVerticalBarPlotEntry(
+
+                             xValues[index],
+                             DefaultBarPosition(seaWaterBoxPlotStat.max - 0.05f, seaWaterBoxPlotStat.max)
+                         )
+                     )
+                 }
+             }
+         }
+         BoxPlotRange.Q2 -> {
+             buildList {
+                 data.forEachIndexed { index, seaWaterBoxPlotStat ->
+                     add(
+                         DefaultVerticalBarPlotEntry(
+
+                             xValues[index],
+                             DefaultBarPosition(seaWaterBoxPlotStat.median - 0.05f, seaWaterBoxPlotStat.median + 0.05f)
+                         )
+                     )
+                 }
+             }
+         }
+     }
 
     VerticalBarPlot(
         values,
         bar = { index, _, _ ->
-            val text = "${values[index].x}\nmax:${data[index].max}\nq3:${data[index].q3}\nmedian:${data[index].median}\nq1:${data[index].q1}\nmin:${data[index].min}"
+
+            val text =
+                "${values[index].x}\nmax:${data[index].max}\nq3:${data[index].q3}\nq2:${data[index].median}\nq1:${data[index].q1}\nmin:${data[index].min}"
+
+            val color = when(range){
+                BoxPlotRange.Q1_Q3 -> colors[xValues[index]] ?: Color.Black
+                BoxPlotRange.MIN_MAX -> colors[xValues[index]] ?: Color.Black
+                BoxPlotRange.MIN, BoxPlotRange.MAX -> Color.Black
+                BoxPlotRange.Q2 -> Color.Yellow
+            }
+
             DefaultBar(
-                brush = SolidColor(colors[xValues[index]] ?: Color.Black),
+                brush = SolidColor(color ),
                 modifier = Modifier.fillMaxWidth(),
-            ){
+            ) {
                 if (usableTooltips) {
-                    Box(modifier = paddingMod.shadow(2.dp).
-                        background(color = Color.LightGray, shape = MaterialTheme.shapes.medium ),
+                    Box(
+                        modifier = paddingMod.shadow(2.dp).background(
+                            color = Color.LightGray.copy(alpha = 0.3f),
+                            shape = MaterialTheme.shapes.medium
+                        ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text , modifier = Modifier.padding(horizontal = 6.dp))
+                        Text(text, modifier = Modifier.padding(horizontal = 6.dp))
                     }
                 }
             }
+
         },
         barWidth = barWidth
     )
+
+
 
 }
 

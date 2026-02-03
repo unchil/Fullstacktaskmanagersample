@@ -102,6 +102,10 @@ enum class ChartType {
     XYGraph, Line, VerticalBar, GroupVerticalBar, BoxPlotChart
 }
 
+enum class BoxPlotRange {
+    MIN_MAX, Q1_Q3, Q2, MIN, MAX
+}
+
 internal val padding = 8.dp
 internal val paddingMod = Modifier.padding(padding)
 
