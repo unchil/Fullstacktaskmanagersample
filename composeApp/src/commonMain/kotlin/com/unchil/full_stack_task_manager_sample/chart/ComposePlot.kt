@@ -33,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.unchil.full_stack_task_manager_sample.SeaWaterBoxPlotStat
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.desc
+import com.unchil.full_stack_task_manager_sample.padding
+import com.unchil.full_stack_task_manager_sample.paddingMod
 import io.github.koalaplot.core.ChartLayout
 import io.github.koalaplot.core.Symbol
 import io.github.koalaplot.core.bar.BarPlotGroupedPointEntry
@@ -375,13 +378,17 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
     VerticalBarPlot(
         values,
         bar = { index, _, _ ->
-            val text = "${values[index].x}\nmax:${data[index].max}\nq3:${data[index].q3}\nmedian:${data[index].median}\nq1:${data[index].q1}\nmin:${data[index].min}\n"
+            val text = "${values[index].x}\nmax:${data[index].max}\nq3:${data[index].q3}\nmedian:${data[index].median}\nq1:${data[index].q1}\nmin:${data[index].min}"
             DefaultBar(
                 brush = SolidColor(colors[xValues[index]] ?: Color.Black),
                 modifier = Modifier.fillMaxWidth(),
-            ){ if (usableTooltips) {
-                    HoverSurface {
-                        Text(text )
+            ){
+                if (usableTooltips) {
+                    Box(modifier = paddingMod.shadow(2.dp).
+                        background(color = Color.LightGray, shape = MaterialTheme.shapes.medium ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text , modifier = Modifier.padding(horizontal = 6.dp))
                     }
                 }
             }

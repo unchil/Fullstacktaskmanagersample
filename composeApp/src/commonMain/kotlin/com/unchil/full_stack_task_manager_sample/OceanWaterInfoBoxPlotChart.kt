@@ -72,7 +72,7 @@ fun OceanWaterInfoBoxPlotChart(){
 
             chartLayout.value = LayoutData(
                 type = ChartType.BoxPlotChart,
-                layout = TitleConfig(true, "Surface Temperature 24-Hours Stat"),
+                layout = TitleConfig(true, "Surface Temperature 24-Hour Stat"),
                 legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig(
                     legendTitle,
