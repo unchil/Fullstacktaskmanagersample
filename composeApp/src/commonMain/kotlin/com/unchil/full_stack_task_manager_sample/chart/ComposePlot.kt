@@ -21,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
@@ -37,6 +38,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.unchil.full_stack_task_manager_sample.SeaWaterBoxPlotStat
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.desc
 import io.github.koalaplot.core.ChartLayout
 import io.github.koalaplot.core.Symbol
@@ -58,6 +60,7 @@ import io.github.koalaplot.core.style.LineStyle
 import io.github.koalaplot.core.util.ExperimentalKoalaPlotApi
 import io.github.koalaplot.core.util.VerticalRotation
 import io.github.koalaplot.core.util.rotateVertically
+import io.github.koalaplot.core.util.toString
 import io.github.koalaplot.core.xygraph.AxisContent
 import io.github.koalaplot.core.xygraph.AxisLabelScope
 import io.github.koalaplot.core.xygraph.AxisStyle
@@ -117,13 +120,14 @@ fun ComposePlot(
                 XYGraph(
                     xAxisModel = when (layout.type) {
                         ChartType.Line -> layout.xAxis.model as DoubleLinearAxisModel
-                        ChartType.VerticalBar -> layout.xAxis.model as CategoryAxisModel<Any>
+                        ChartType.VerticalBar, ChartType.BoxPlotChart -> layout.xAxis.model as CategoryAxisModel<Any>
                         ChartType.GroupVerticalBar -> layout.xAxis.model as CategoryAxisModel<Any>
                         ChartType.XYGraph -> layout.xAxis.model as CategoryAxisModel<Any>
                     },
                     yAxisModel = when (layout.type) {
                         ChartType.XYGraph -> layout.yAxis.model as FloatLinearAxisModel
                         ChartType.VerticalBar -> layout.yAxis.model as FloatLinearAxisModel
+                        ChartType.BoxPlotChart -> layout.yAxis.model as FloatLinearAxisModel
                         ChartType.GroupVerticalBar -> layout.yAxis.model as FloatLinearAxisModel
                         ChartType.Line -> layout.yAxis.model as FloatLinearAxisModel
                     },
@@ -131,7 +135,7 @@ fun ComposePlot(
                         labels = {
                             if (layout.xAxis.isLabels) {
                                 when (layout.type) {
-                                    ChartType.XYGraph, ChartType.VerticalBar, ChartType.GroupVerticalBar -> {
+                                    ChartType.XYGraph, ChartType.VerticalBar, ChartType.GroupVerticalBar, ChartType.BoxPlotChart -> {
                                         AxisLabel(it.toString(), Modifier.padding(top = 2.dp))
                                     }
                                     ChartType.Line -> {
@@ -201,46 +205,27 @@ fun ComposePlot(
                 ) {
                     when (layout.type) {
                         ChartType.Line -> {
-
-
                             val scope = this as XYGraphScope<Double, Float>
-                            (data as Map<String, List<Float>>).entries.sortedBy { it.key }
-                                .forEach { (key, values) ->
-                                    scope.LineChart(
-                                        key,
-                                        values = values.mapIndexed { index, value ->
-                                            DefaultPoint(
-                                                (xValues as List<Double>)[index],
-                                                value.toFloat()
-                                            )
-                                        },
-                                        layout.tooltips.isTooltips,
-                                        colors
-                                    )
-                                }
-
+                            scope.LineChart(data, xValues, layout.tooltips.isTooltips, colors)
                         }
 
                         ChartType.VerticalBar -> {
                             val scope = this as XYGraphScope<String, Float>
-                            scope.VerticalBarChart(
-                                (data as List<Float>),
-                                (xValues as List<String>),
-                                layout.tooltips.isTooltips,
-                                colors,
-                                layout.barConf.widthWeight
-                            )
+                            scope.VerticalBarChart(data, xValues,layout.tooltips.isTooltips, colors,layout.barConf.widthWeight  )
                         }
+
+                        ChartType.BoxPlotChart -> {
+                            val scope = this as XYGraphScope<String, Float>
+                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors,layout.barConf.widthWeight  )
+                        }
+
 
                         ChartType.GroupVerticalBar -> {
                             val scope = this as XYGraphScope<Int, Float>
-                            scope.GroupVerticalBarChart(
-                                (data as Map<String, List<Int>>),
-                                (xValues as List<Int>),
-                                layout.tooltips.isTooltips,
-                                colors,
-                            )
+                            scope.GroupVerticalBarChart(data, xValues,layout.tooltips.isTooltips, colors  )
                         }
+
+
 
                         ChartType.XYGraph -> TODO()
                     }
@@ -365,36 +350,91 @@ fun Legend(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalKoalaPlotApi::class)
 @Composable
+fun XYGraphScope<String, Float>.BoxPlotChart(
+    data:Any,
+    xValues:Any,
+    usableTooltips: Boolean,
+    colors: Map<String, Color>,
+    barWidth: Float = 0.5f
+) {
+    val data = (data as List<SeaWaterBoxPlotStat>)
+    val xValues = (xValues as List<String>)
+
+    val values: List<VerticalBarPlotEntry<String, Float>> = buildList {
+        data.forEachIndexed { index, seaWaterBoxPlotStat ->
+            add(
+                DefaultVerticalBarPlotEntry(
+
+                    xValues[index],
+                    DefaultBarPosition(seaWaterBoxPlotStat.q1, seaWaterBoxPlotStat.q3)
+                )
+            )
+        }
+    }
+
+    VerticalBarPlot(
+        values,
+        bar = { index, _, _ ->
+            val text = "${values[index].x}\nmax:${data[index].max}\nq3:${data[index].q3}\nmedian:${data[index].median}\nq1:${data[index].q1}\nmin:${data[index].min}\n"
+            DefaultBar(
+                brush = SolidColor(colors[xValues[index]] ?: Color.Black),
+                modifier = Modifier.fillMaxWidth(),
+            ){ if (usableTooltips) {
+                    HoverSurface {
+                        Text(text )
+                    }
+                }
+            }
+        },
+        barWidth = barWidth
+    )
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalKoalaPlotApi::class)
+@Composable
 fun XYGraphScope<Double, Float>.LineChart(
-    key: String,
-    values: List<DefaultPoint<Double, Float>>,
+    data:Any,
+    xValues:Any,
     usableTooltips: Boolean,
     colors: Map<String, Color>
 ) {
-    LinePlot2(
-        data = values,
-        lineStyle = LineStyle(
-            brush = SolidColor(colors[key] ?: Color.Black),
-            strokeWidth = 2.dp),
-        symbol = { point ->
-            TooltipBox(
-                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-                    TooltipAnchorPosition.Above),
-                tooltip = {
-                    if (usableTooltips) {
-                        PlainTooltip { Text("${key}\n${formatLongToDateTime(point.x)}\n${ point.y}") }
-                    }
-                },
-                state = rememberTooltipState(),
-            ) {
-                Symbol(
-                    shape = CircleShape,
-                    fillBrush = SolidColor(colors[key] ?: Color.Black),
-                    size = 6.dp,
+
+    val data = (data as Map<String, List<Float>>)
+    val xValues = (xValues as List<Double>)
+    data.entries.sortedBy { it.key }
+        .forEach { (key, values) ->
+
+        LinePlot2(
+            data = values.mapIndexed { index, value ->
+                DefaultPoint(
+                    xValues[index],
+                    value.toFloat()
                 )
-            }
-        },
-    )
+            },
+            lineStyle = LineStyle(
+                brush = SolidColor(colors[key] ?: Color.Black),
+                strokeWidth = 1.dp),
+            symbol = { point ->
+                TooltipBox(
+                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                        TooltipAnchorPosition.Above),
+                    tooltip = {
+                        if (usableTooltips) {
+                            PlainTooltip { Text("${key}\n${formatLongToDateTime(point.x)}\n${ kotlin.math.round(point.y * 10) / 10.0}") }
+                        }
+                    },
+                    state = rememberTooltipState(),
+                ) {
+                    Symbol(
+                        shape = ShapeDefaults.ExtraSmall,
+                        fillBrush = SolidColor(colors[key] ?: Color.Black),
+                        size = 6.dp,
+                    )
+                }
+            },
+        )
+    }
 }
 
 
@@ -403,18 +443,21 @@ fun XYGraphScope<Double, Float>.LineChart(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalKoalaPlotApi::class)
 @Composable
 fun XYGraphScope<String, Float>.VerticalBarChart(
-    data: List<Float>,
-    xValues: List<String>,
+    data: Any,
+    xValues: Any,
     usableTooltips: Boolean,
     colors: Map<String, Color>,
     barWidth: Float = 0.9f
 ){
+    val data = (data as List<Float>)
+    val xValues = (xValues as  List<String>)
+
     val values: List<VerticalBarPlotEntry<String, Float>> = buildList {
         data.forEachIndexed { index, fl ->
             add(
                 DefaultVerticalBarPlotEntry(
                  //   (index + 1).toFloat(),
-                   xValues[index],
+                    xValues[index],
                     DefaultBarPosition(0f, fl)
                 )
             )
@@ -437,11 +480,13 @@ fun XYGraphScope<String, Float>.VerticalBarChart(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalKoalaPlotApi::class)
 @Composable
 fun XYGraphScope<Int, Float>.GroupVerticalBarChart(
-    data: Map<String, List<Int>>,
-    xValues: List<Int>,
+    data:Any,
+    xValues: Any,
     usableTooltips: Boolean,
     colors: Map<String, Color>,
 ){
+    val data = (data as Map<String, List<Int>>)
+    val xValues =  (xValues as List<Int>)
     val values:List<BarPlotGroupedPointEntry<Int, Float>> =
         xValues.mapIndexed { xIndex, value ->
             object : BarPlotGroupedPointEntry<Int, Float> {

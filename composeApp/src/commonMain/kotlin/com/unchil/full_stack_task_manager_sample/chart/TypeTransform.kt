@@ -1,6 +1,7 @@
 package com.unchil.full_stack_task_manager_sample.chart
 
 
+import com.unchil.full_stack_task_manager_sample.SeaWaterBoxPlotStat
 import com.unchil.full_stack_task_manager_sample.SeaWaterInformation
 import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservationPoint
 import com.unchil.un7datagrid.toMap
@@ -44,7 +45,7 @@ fun List<*>.toMofLineMap(qualityType: WATER_QUALITY.QualityType):Map<String, Any
 
     // 1. 기본 필터링 및 데이터 추출 (시간순 정렬 포함)
     val rawData = this.filterIsInstance<SeaWaterInformation>()
-        .filter { !listOf("SEA6001", "SEA1005").contains(it.rtmWqWtchStaCd) }
+       // .filter { !listOf("SEA6001", "SEA1005").contains(it.rtmWqWtchStaCd) }
         .sortedBy { it.rtmWqWtchDtlDt } // 이전 값을 참조하기 위해 시간순 정렬 필수
 
 
@@ -199,9 +200,60 @@ fun List<SeawaterInformationByObservationPoint>.toBarChartMap(): Map<String, Lis
     val values = gridData["WaterTemperature"]?.map {  it.toString().trim().toFloatOrNull() ?: 0f }
 
     return mapOf("entries" to entries, "xValue" to entries, "values" to values)
+}
 
+
+
+
+fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap():Map<String, List<Any>> {
+    val result =  this.filter { it.obs_lay.equals("1") }.map {
+        Pair(
+            it.sta_nam_kor,
+            it.wtr_tmp.trim().toFloatOrNull() ?: 0f
+        )
+    }.groupBy { it.first  } // Pair(gru_nam, sta_nam_kor) 기준
+        .mapValues { (key, values) ->
+            val temps = values.map { it.second }.sorted() // 오름차순 정렬
+            val n = temps.size
+            if (n == 0) return mapOf()
+            // 사분위수 계산 (단순 인덱스 방식)
+            val q1 = temps[n / 4]
+            val median = temps[n / 2]
+            val q3 = temps[n * 3 / 4]
+
+            // 이상치(Outlier) 계산 로직
+            val iqr = q3 - q1
+            val lowerFence = q1 - (1.5f * iqr)
+            val upperFence = q3 + (1.5f * iqr)
+
+            // Fence 내부에 있는 값들 중 실제 최소/최대값 결정 (Whiskers 끝점)
+            val actualMin = temps.filter { it >= lowerFence }.firstOrNull() ?: temps.first()
+            val actualMax = temps.filter { it <= upperFence }.lastOrNull() ?: temps.last()
+
+            // Fence를 벗어나는 값들을 이상치로 추출
+            val outliers = temps.filter { it < lowerFence || it > upperFence }
+
+            SeaWaterBoxPlotStat(
+                gruNam = "",
+                staName = key,
+                min = actualMin,
+                q1 = q1,
+                median = median,
+                q3 = q3,
+                max = actualMax,
+                outliers = outliers
+            )
+        }
+
+        val entries = result.keys.toList()
+        val values = result.values.toList()
+
+        return mapOf("entries" to entries, "xValue" to entries, "values" to values)
 
 }
+
+
+
 
 
 fun SeaWaterInformation.makeGridColumns():List<String>{

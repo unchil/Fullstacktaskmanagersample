@@ -144,9 +144,9 @@ fun OceanWaterInfoLineChart_MOF(){
             chartLayout.value = LayoutData(
                 size = SizeConfig(height = 500.dp),
                 type = ChartType.Line,
-                layout = TitleConfig(true, "24-hour Ocean Water Information", description = selectedOption.desc()),
+                layout = TitleConfig(true, "24-hour Ocean Water Information (${selectedOption.name()})", description = selectedOption.desc()),
                 legend = LegendConfig(true, true, legendTitle),
-                xAxis = AxisConfig("Collecting Time",
+                xAxis = AxisConfig(
                     model = DoubleLinearAxisModel(xRange) as AxisModel<Any>,
                     style = AxisStyle(labelRotation = 0),
 

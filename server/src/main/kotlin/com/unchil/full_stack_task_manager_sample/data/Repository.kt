@@ -12,6 +12,7 @@ import com.unchil.full_stack_task_manager_sample.SeaWaterInfoByOneHourStat
 import com.unchil.full_stack_task_manager_sample.SeaWaterInformation
 import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservationPoint
 import com.unchil.full_stack_task_manager_sample.Observatory
+import com.unchil.full_stack_task_manager_sample.SeaWaterBoxPlotStat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
@@ -21,7 +22,10 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.minus
+import kotlinx.datetime.toDeprecatedInstant
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.toStdlibInstant
 import org.jetbrains.exposed.v1.core.FloatColumnType
 import org.jetbrains.exposed.v1.core.JoinType
 import org.jetbrains.exposed.v1.core.SortOrder
@@ -47,6 +51,8 @@ private val cacheStorage_SeawaterInfo = ConcurrentHashMap<String, Pair<List<Seaw
 
 private val cacheStorage_SeawaterInfo_Mof = ConcurrentHashMap<String, Pair<List<SeaWaterInformation>, Long>>()
 private val cacheStorage_SeaWaterInfoStatistics = ConcurrentHashMap<String, Pair<List<SeaWaterInfoByOneHourStat>, Long>>()
+
+private val cacheStorage_SeaWaterInfoBoxPlot = ConcurrentHashMap<String, Pair<List<SeaWaterBoxPlotStat>, Long>>()
 private const val CACHE_EXPIRY_SECONDS =  1 * 60L  // 10분
 
 
@@ -93,6 +99,27 @@ class Repository:RepositoryInterface {
         val resultFromDb = fetchSeaWaterInfoFromDb_Mof(division)
         if (resultFromDb.isNotEmpty() ) {
             cacheStorage_SeawaterInfo_Mof[key] = Pair(resultFromDb, now)
+        }
+        return resultFromDb
+    }
+
+
+    suspend fun seaWaterInfoOneDayBoxPlot(division:String):List<SeaWaterBoxPlotStat?>{
+        val key = "cache_$division"
+        val now = System.currentTimeMillis()
+
+        // 캐시에서 데이터 조회 (suspendTransaction 외부)
+        cacheStorage_SeaWaterInfoBoxPlot[key]?.let { cachedData ->
+            if ((now - cachedData.second) < TimeUnit.SECONDS.toMillis(CACHE_EXPIRY_SECONDS)) {
+                LOGGER.info("Serving from cache for ID: $division")
+                return cachedData.first
+            }
+        }
+
+        // 캐시에 없거나 만료된 경우 DB에서 데이터 조회 (suspendTransaction 내부 호출)
+        val resultFromDb = fetchSeaWaterInfoOneDayBoxPlotFromDb()
+        if (resultFromDb.isNotEmpty() ) {
+            cacheStorage_SeaWaterInfoBoxPlot[key] = Pair(resultFromDb, now)
         }
         return resultFromDb
     }
@@ -182,6 +209,7 @@ class Repository:RepositoryInterface {
                         toSeawaterInformationByObservationPoint(it)
                     }
             }
+
             "grid" -> {
                 val previous24Hour = Clock.System.now()
                     .minus(24, DateTimeUnit.HOUR)
@@ -253,6 +281,88 @@ class Repository:RepositoryInterface {
             else -> {emptyList()}
         }
         return@suspendTransaction result
+    }
+
+
+    @OptIn(FormatStringsInDatetimeFormats::class)
+    suspend fun fetchSeaWaterInfoOneDayBoxPlotFromDb(): List<SeaWaterBoxPlotStat>  = suspendTransaction {
+
+        val previous24Hour =
+            kotlin.time.Clock.System.now()
+                .minus(24, DateTimeUnit.HOUR)
+                .toLocalDateTime(TimeZone.UTC)
+                .format(LocalDateTime.Format{byUnicodePattern("yyyy-MM-dd HH:mm:ss")})
+
+        val rawRecords = ObservationTable.join(
+            ObservatoryTable,
+            JoinType.INNER,
+            onColumn = ObservationTable.sta_cde,
+            otherColumn = ObservatoryTable.sta_cde
+        ).select( ObservationTable.sta_cde,
+            ObservationTable.sta_nam_kor,
+            ObservationTable.obs_datetime,
+            ObservationTable.obs_lay,
+            ObservationTable.wtr_tmp,
+            ObservatoryTable.gru_nam,
+        ).where{
+            (ObservationTable.obs_datetime greaterEq previous24Hour) and
+                    (ObservationTable.obs_lay eq "1")
+        }.map {
+            // (그룹명, 관측소명, 수온) Triple로 변환
+            Triple(
+                it[ObservatoryTable.gru_nam],
+                it[ObservationTable.sta_nam_kor],
+                it[ObservationTable.wtr_tmp].trim().toFloatOrNull() ?: 0f
+            )
+        }
+
+        // 2. 관측소별로 그룹화하여 통계 계산
+        val result = rawRecords.groupBy { it.first to it.second } // Pair(gru_nam, sta_nam_kor) 기준
+            .map { (key, values) ->
+                val temps = values.map { it.third }.sorted() // 오름차순 정렬
+                val n = temps.size
+
+                if (n == 0) return@map SeaWaterBoxPlotStat(
+                    key.first,
+                    key.second,
+                    0f,
+                    0f,
+                    0f,
+                    0f,
+                    0f
+                )
+
+                // 사분위수 계산 (단순 인덱스 방식)
+                val q1 = temps[n / 4]
+                val median = temps[n / 2]
+                val q3 = temps[n * 3 / 4]
+
+                // 이상치(Outlier) 계산 로직
+                val iqr = q3 - q1
+                val lowerFence = q1 - (1.5f * iqr)
+                val upperFence = q3 + (1.5f * iqr)
+
+                // Fence 내부에 있는 값들 중 실제 최소/최대값 결정 (Whiskers 끝점)
+                val actualMin = temps.firstOrNull { it >= lowerFence } ?: temps.first()
+                val actualMax = temps.lastOrNull { it <= upperFence } ?: temps.last()
+
+                // Fence를 벗어나는 값들을 이상치로 추출
+                val outliers = temps.filter { it !in lowerFence..upperFence }
+
+                SeaWaterBoxPlotStat(
+                    gruNam = key.first,
+                    staName = key.second,
+                    min = actualMin,
+                    q1 = q1,
+                    median = median,
+                    q3 = q3,
+                    max = actualMax,
+                    outliers = outliers
+                )
+            }
+
+        return@suspendTransaction result
+
     }
 
     suspend fun seaWaterInfoStatistics(): List<SeaWaterInfoByOneHourStat>{

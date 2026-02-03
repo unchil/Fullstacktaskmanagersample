@@ -99,7 +99,7 @@ data class LayoutData(
 }
 
 enum class ChartType {
-    XYGraph, Line, VerticalBar, GroupVerticalBar
+    XYGraph, Line, VerticalBar, GroupVerticalBar, BoxPlotChart
 }
 
 internal val padding = 8.dp

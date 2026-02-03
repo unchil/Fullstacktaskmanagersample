@@ -48,6 +48,19 @@ fun Application.configureSerialization(repository: Repository) {
                 }
             }
 
+            get("/seawaterinfo/oneDayBoxPlot"){
+                try {
+                    val result = repository.seaWaterInfoOneDayBoxPlot("oneDayBoxPlot")
+                    if (result.isEmpty()) {
+                        call.respond(HttpStatusCode.NotFound)
+                        return@get
+                    }
+                    call.respond(result)
+                } catch (ex: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                }
+            }
+
             get ("/stat"){
 
                 try {

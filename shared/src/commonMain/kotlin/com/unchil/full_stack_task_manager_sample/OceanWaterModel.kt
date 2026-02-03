@@ -4,6 +4,17 @@ package com.unchil.full_stack_task_manager_sample
 import kotlinx.serialization.Serializable
 
 
+@Serializable
+data class SeaWaterBoxPlotStat(
+    val gruNam: String,
+    val staName: String,
+    val min: Float,     // 이상치 제외 최소값 또는 Lower Bound
+    val q1: Float,
+    val median: Float,
+    val q3: Float,
+    val max: Float,     // 이상치 제외 최대값 또는 Upper Bound
+    val outliers: List<Float> = emptyList() // 이상치 목록
+)
 
 enum class DATA_DIVISION {
     oneday, grid, current, statistics, mof_oneday
@@ -96,4 +107,5 @@ data class Observatory(
     val bot_dep: String?,
     val sta_des: String?
 )
+
 
