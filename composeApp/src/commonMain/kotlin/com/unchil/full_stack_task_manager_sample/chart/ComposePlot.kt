@@ -226,6 +226,8 @@ fun ComposePlot(
                             scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.MIN )
                             scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.MAX)
                             scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.Q2)
+                            scope.BoxPlotOutliers(data, xValues, layout.tooltips.isTooltips, colors)
+
                         }
 
 
@@ -479,6 +481,54 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
         barWidth = barWidth
     )
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalKoalaPlotApi::class)
+@Composable
+fun XYGraphScope<String, Float>.BoxPlotOutliers(
+    data:Any,
+    xValues:Any,
+    usableTooltips: Boolean,
+    colors: Map<String, Color>
+){
+    val data = (data as List<SeaWaterBoxPlotStat>).map {
+        it.outliers
+    }
+    val xValues = (xValues as List<String>)
+
+    data.forEachIndexed { index, floats ->
+
+        LinePlot2(
+            data =  floats.map {
+                DefaultPoint(
+                    xValues[index],
+                    it
+                )
+            },
+            lineStyle = LineStyle(
+                brush = SolidColor(colors[xValues[index]] ?: Color.Black),
+                strokeWidth = 0.dp),
+            symbol = { point ->
+                TooltipBox(
+                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                        TooltipAnchorPosition.Above),
+                    tooltip = {
+                        if (usableTooltips) {
+                            PlainTooltip { Text("${xValues[index]}\n${point.y}") }
+                        }
+                    },
+                    state = rememberTooltipState(),
+                ) {
+                    Symbol(
+                        shape = ShapeDefaults.ExtraSmall,
+                        fillBrush = SolidColor(colors[xValues[index]] ?: Color.Black),
+                        size = 4.dp,
+                    )
+                }
+            },
+        )
+
+    }
 
 
 }
