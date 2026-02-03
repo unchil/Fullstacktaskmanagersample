@@ -50,7 +50,7 @@ This project leverages several powerful libraries to handle data and UI:
 
 |          ScreenShot [ Browser(Safari,Chrome)/Desktop(macOS 26.2)/iOS(26.2)/Android(api 36.0) ]          |
 |:-------------------------------------------------------------------------------------------------------:|
-| ![ScreenShot](https://github.com/unchil/Fullstacktaskmanagersample/raw/main/screenshot/screenshot2.png) | 
+| ![ScreenShot](https://github.com/unchil/Fullstacktaskmanagersample/raw/main/screenshot/screenshot4.png) | 
 |    ![ScreenShot](https://github.com/unchil/Fullstacktaskmanagersample/raw/main/screenshot/full.gif)     | 
 
 ## Setup & Installation
