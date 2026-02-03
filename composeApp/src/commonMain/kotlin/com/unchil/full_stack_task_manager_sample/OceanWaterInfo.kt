@@ -52,9 +52,9 @@ fun OceanWaterInfo(){
 
                 OceanWaterInfoDataGrid()
                 HorizontalDivider(modifier = Modifier.padding(10.dp))
-                OceanWaterInfoBoxPlotChart()
-                HorizontalDivider(modifier = Modifier.padding(10.dp))
                 OceanWaterInfoBarChart()
+                HorizontalDivider(modifier = Modifier.padding(10.dp))
+                OceanWaterInfoBoxPlotChart()
                 HorizontalDivider(modifier = Modifier.padding(10.dp))
                 OceanWaterInfoLineChart()
                 HorizontalDivider(modifier = Modifier.padding(10.dp))

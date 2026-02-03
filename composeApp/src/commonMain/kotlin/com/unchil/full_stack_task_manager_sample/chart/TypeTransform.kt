@@ -227,11 +227,11 @@ fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap():Map<String, List<
             val upperFence = q3 + (1.5f * iqr)
 
             // Fence 내부에 있는 값들 중 실제 최소/최대값 결정 (Whiskers 끝점)
-            val actualMin = temps.filter { it >= lowerFence }.firstOrNull() ?: temps.first()
-            val actualMax = temps.filter { it <= upperFence }.lastOrNull() ?: temps.last()
+            val actualMin = temps.firstOrNull { it >= lowerFence } ?: temps.first()
+            val actualMax = temps.lastOrNull { it <= upperFence } ?: temps.last()
 
             // Fence를 벗어나는 값들을 이상치로 추출
-            val outliers = temps.filter { it < lowerFence || it > upperFence }
+            val outliers = temps.filter { it !in lowerFence..upperFence }
 
             SeaWaterBoxPlotStat(
                 gruNam = "",

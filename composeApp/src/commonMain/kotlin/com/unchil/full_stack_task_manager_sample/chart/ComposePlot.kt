@@ -124,14 +124,14 @@ fun ComposePlot(
                 XYGraph(
                     xAxisModel = when (layout.type) {
                         ChartType.Line -> layout.xAxis.model as DoubleLinearAxisModel
-                        ChartType.VerticalBar, ChartType.BoxPlotChart -> layout.xAxis.model as CategoryAxisModel<Any>
+                        ChartType.VerticalBar, ChartType.BoxPlot -> layout.xAxis.model as CategoryAxisModel<Any>
                         ChartType.GroupVerticalBar -> layout.xAxis.model as CategoryAxisModel<Any>
                         ChartType.XYGraph -> layout.xAxis.model as CategoryAxisModel<Any>
                     },
                     yAxisModel = when (layout.type) {
                         ChartType.XYGraph -> layout.yAxis.model as FloatLinearAxisModel
                         ChartType.VerticalBar -> layout.yAxis.model as FloatLinearAxisModel
-                        ChartType.BoxPlotChart -> layout.yAxis.model as FloatLinearAxisModel
+                        ChartType.BoxPlot -> layout.yAxis.model as FloatLinearAxisModel
                         ChartType.GroupVerticalBar -> layout.yAxis.model as FloatLinearAxisModel
                         ChartType.Line -> layout.yAxis.model as FloatLinearAxisModel
                     },
@@ -139,7 +139,7 @@ fun ComposePlot(
                         labels = {
                             if (layout.xAxis.isLabels) {
                                 when (layout.type) {
-                                    ChartType.XYGraph, ChartType.VerticalBar, ChartType.GroupVerticalBar, ChartType.BoxPlotChart -> {
+                                    ChartType.XYGraph, ChartType.VerticalBar, ChartType.GroupVerticalBar, ChartType.BoxPlot -> {
                                         AxisLabel(it.toString(), Modifier.padding(top = 2.dp))
                                     }
                                     ChartType.Line -> {
@@ -218,16 +218,9 @@ fun ComposePlot(
                             scope.VerticalBarChart(data, xValues,layout.tooltips.isTooltips, colors,layout.barConf.widthWeight  )
                         }
 
-                        ChartType.BoxPlotChart -> {
+                        ChartType.BoxPlot -> {
                             val scope = this as XYGraphScope<String, Float>
-
-                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors , BoxPlotRange.Q1_Q3)
-                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.MIN_MAX )
-                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.MIN )
-                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.MAX)
-                            scope.BoxPlotChart(data, xValues,layout.tooltips.isTooltips, colors, BoxPlotRange.Q2)
-                            scope.BoxPlotOutliers(data, xValues, layout.tooltips.isTooltips, colors)
-
+                            scope.BoxPlot(data, xValues,layout.tooltips.isTooltips, colors )
                         }
 
 
@@ -357,6 +350,23 @@ fun Legend(
 
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalKoalaPlotApi::class)
+@Composable
+fun XYGraphScope<String, Float>.BoxPlot(
+    data:Any,
+    xValues:Any,
+    usableTooltips: Boolean,
+    colors: Map<String, Color>,
+) {
+    BoxPlotChart(data, xValues,usableTooltips, colors , BoxPlotRange.Q1_Q3)
+    BoxPlotChart(data, xValues,usableTooltips, colors, BoxPlotRange.MIN_MAX )
+    BoxPlotChart(data, xValues,usableTooltips, colors, BoxPlotRange.MIN )
+    BoxPlotChart(data, xValues,usableTooltips, colors, BoxPlotRange.MAX)
+    BoxPlotChart(data, xValues,usableTooltips, colors, BoxPlotRange.Q2)
+    BoxPlotOutliers(data, xValues, usableTooltips, colors)
+
+}
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalKoalaPlotApi::class)

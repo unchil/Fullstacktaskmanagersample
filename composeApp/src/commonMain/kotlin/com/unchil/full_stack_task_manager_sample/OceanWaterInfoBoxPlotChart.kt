@@ -71,7 +71,7 @@ fun OceanWaterInfoBoxPlotChart(){
             range.value = 0f..(yMax + (yMax * 0.1f) )
 
             chartLayout.value = LayoutData(
-                type = ChartType.BoxPlotChart,
+                type = ChartType.BoxPlot,
                 layout = TitleConfig(true, "Surface Temperature 24-Hour Stat"),
                 legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig(
