@@ -1,6 +1,11 @@
 package com.unchil.full_stack_task_manager_sample
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -9,7 +14,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.unchil.full_stack_task_manager_sample.SEA_AREA.gru_nam
 import com.unchil.full_stack_task_manager_sample.chart.AxisConfig
 import com.unchil.full_stack_task_manager_sample.chart.CaptionConfig
 import com.unchil.full_stack_task_manager_sample.chart.ChartType
@@ -45,6 +53,7 @@ fun OceanWaterInfoBarChart(){
     }
 
     var isVisible by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf(SEA_AREA.GRU_NAME.entries[0]) }
 
     val seaWaterInfo = viewModel._seaWaterInfo.collectAsState()
 
@@ -55,13 +64,13 @@ fun OceanWaterInfoBarChart(){
     val chartLayout = remember { mutableStateOf(LayoutData() )}
     val range = remember { mutableStateOf(0f..0f)}
 
-    LaunchedEffect(seaWaterInfo.value){
+    LaunchedEffect(seaWaterInfo.value, key2=selectedOption){
 
         isVisible = seaWaterInfo.value.isNotEmpty()
 
         if(isVisible){
             val legendTitle = "Observatory"
-            data.value = seaWaterInfo.value.toBarChartMap()
+            data.value = seaWaterInfo.value.toBarChartMap(selectedOption.gru_nam())
             entries.value = data.value["entries"] as List<String>
             xValue.value = entries.value
             values.value = data.value["values"] as List<Float>
@@ -94,6 +103,28 @@ fun OceanWaterInfoBarChart(){
 
     Column (modifier = paddingMod) {
         if (isVisible) {
+            Row {
+                SEA_AREA.GRU_NAME.entries.forEach { entrie ->
+                    Row(
+                        Modifier
+                            .selectable(
+                                selected = (entrie == selectedOption),
+                                onClick = { selectedOption = entrie }
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (entrie == selectedOption),
+                            onClick = { selectedOption = entrie }
+                        )
+                        Text(
+                            text = entrie.name,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
+                }
+            }
             ComposePlot(
                 layout = chartLayout.value,
                 data = values.value,

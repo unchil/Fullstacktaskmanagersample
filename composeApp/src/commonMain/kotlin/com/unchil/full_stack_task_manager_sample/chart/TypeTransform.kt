@@ -193,9 +193,9 @@ fun List<SeawaterInformationByObservationPoint>.toGridDataMap(): Map<String, Lis
 
 
 
-fun List<SeawaterInformationByObservationPoint>.toBarChartMap(): Map<String, List<*>?> {
+fun List<SeawaterInformationByObservationPoint>.toBarChartMap(gruName: String): Map<String, List<*>?> {
 
-    val gridData = this.filter{ it.obs_lay == "1"}.toGridDataMap()
+    val gridData = this.filter{ it.gru_nam == gruName && it.obs_lay == "1"}.toGridDataMap()
     val entries = gridData["Observatory"] as List<*>
     val values = gridData["WaterTemperature"]?.map {  it.toString().trim().toFloatOrNull() ?: 0f }
 
