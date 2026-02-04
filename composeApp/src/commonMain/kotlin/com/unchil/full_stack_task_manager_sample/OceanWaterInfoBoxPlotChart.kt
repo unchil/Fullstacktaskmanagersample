@@ -64,10 +64,17 @@ fun OceanWaterInfoBoxPlotChart(){
     val chartLayout = remember { mutableStateOf(LayoutData() )}
     val range = remember { mutableStateOf(0f..25f)}
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
-        isVisible = seaWaterInfo.value.isNotEmpty()
+
+        val tempData = seaWaterInfo.value.filter {
+            it.gru_nam.equals(selectedOption.gru_nam()) &&  it.obs_lay == "1"
+        }
+        isVisible = tempData.size > 0
+
+
+
         if(isVisible){
             val legendTitle = "Observatory"
-            data.value = seaWaterInfo.value.toBoxPlotMap(selectedOption.gru_nam())
+            data.value = tempData.toBoxPlotMap()
             entries.value = data.value["entries"] as List<String>
             xValue.value = entries.value
             values.value = data.value["values"] as List<SeaWaterBoxPlotStat>
@@ -108,8 +115,9 @@ fun OceanWaterInfoBoxPlotChart(){
 
     }
 
+    if (isVisible) {
     Column (modifier = paddingMod) {
-        if (isVisible) {
+
             Row {
                 SEA_AREA.GRU_NAME.entries.forEach { entrie ->
                     Row(

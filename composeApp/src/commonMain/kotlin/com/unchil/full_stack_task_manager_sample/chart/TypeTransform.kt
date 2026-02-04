@@ -117,13 +117,12 @@ fun List<*>.toMofLineMap(qualityType: WATER_QUALITY.QualityType):Map<String, Any
 
 
 @OptIn(FormatStringsInDatetimeFormats::class)
-fun List<*>.toLineMap(gruName: String): Map<String, Any> {
+fun List<*>.toLineMap(): Map<String, Any> {
     val inputFormat = LocalDateTime.Format { byUnicodePattern("yyyy-MM-dd HH:mm:ss") }
     val outputFormat = LocalDateTime.Format { byUnicodePattern("yy/MM/dd HH:mm") }
 
     // 1. 기본 필터링 및 데이터 추출 (시간순 정렬 포함)
     val rawData = this.filterIsInstance<SeawaterInformationByObservationPoint>()
-        .filter { it.gru_nam == gruName && it.obs_lay == "1" }
         .sortedBy { it.obs_datetime } // 이전 값을 참조하기 위해 시간순 정렬 필수
 
     // 2. 관측소별로 그룹화하여 결측치 보정 (Forward Fill)
@@ -193,11 +192,12 @@ fun List<SeawaterInformationByObservationPoint>.toGridDataMap(): Map<String, Lis
 
 
 
-fun List<SeawaterInformationByObservationPoint>.toBarChartMap(gruName: String): Map<String, List<*>?> {
+fun List<SeawaterInformationByObservationPoint>.toBarChartMap(): Map<String, List<Any?>> {
 
-    val gridData = this.filter{ it.gru_nam == gruName && it.obs_lay == "1"}.toGridDataMap()
-    val entries = gridData["Observatory"] as List<*>
-    val values = gridData["WaterTemperature"]?.map {  it.toString().trim().toFloatOrNull() ?: 0f }
+
+    val gridData = this.toGridDataMap()
+    val entries = gridData["Observatory"] ?: emptyList()
+    val values = gridData["WaterTemperature"]?.map {  it.toString().trim().toFloatOrNull() ?: 0f } ?: emptyList()
 
     return mapOf("entries" to entries, "xValue" to entries, "values" to values)
 }
@@ -205,8 +205,8 @@ fun List<SeawaterInformationByObservationPoint>.toBarChartMap(gruName: String): 
 
 
 
-fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap( gruName: String):Map<String, List<Any>> {
-    val result =  this.filter { it.gru_nam == gruName && it.obs_lay.equals("1") }.map {
+fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap():Map<String, List<Any>> {
+    val result =  this.map {
         Pair(
             it.sta_nam_kor,
             it.wtr_tmp.trim().toFloatOrNull() ?: 0f

@@ -65,13 +65,16 @@ fun OceanWaterInfoLineChart(){
     val range = remember { mutableStateOf(0f..0f)}
 
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
+        val tempData = seaWaterInfo.value.filter {
+            it.gru_nam.equals(selectedOption.gru_nam()) &&  it.obs_lay == "1"
+        }
+        isVisible = tempData.size > 0
 
-        isVisible = seaWaterInfo.value.isNotEmpty()
 
         if(isVisible) {
 
             val legendTitle = "Observatory"
-            val data = seaWaterInfo.value.toLineMap(selectedOption.gru_nam())
+            val data = tempData.toLineMap()
             entries.value = data["entries"] as List<String>
             xValue.value = data["xValue" ] as List<Double>
             rawData.value = data["values" ] as Map<String, List<Float>>
@@ -100,8 +103,10 @@ fun OceanWaterInfoLineChart(){
         }
     }
 
+
+    if (isVisible) {
     Column (modifier = paddingMod) {
-        if (isVisible) {
+
             Row {
                 SEA_AREA.GRU_NAME.entries.forEach { entrie ->
                     Row(

@@ -64,13 +64,16 @@ fun OceanWaterInfoBarChart(){
     val chartLayout = remember { mutableStateOf(LayoutData() )}
     val range = remember { mutableStateOf(0f..0f)}
 
-    LaunchedEffect(seaWaterInfo.value, key2=selectedOption){
+    LaunchedEffect(seaWaterInfo.value, selectedOption){
 
-        isVisible = seaWaterInfo.value.isNotEmpty()
+         val tempData = seaWaterInfo.value.filter {
+             it.gru_nam.equals(selectedOption.gru_nam()) &&  it.obs_lay == "1"
+         }
+        isVisible = tempData.size > 0
 
         if(isVisible){
             val legendTitle = "Observatory"
-            data.value = seaWaterInfo.value.toBarChartMap(selectedOption.gru_nam())
+            data.value = tempData.toBarChartMap()
             entries.value = data.value["entries"] as List<String>
             xValue.value = entries.value
             values.value = data.value["values"] as List<Float>
@@ -79,7 +82,7 @@ fun OceanWaterInfoBarChart(){
 
             chartLayout.value = LayoutData(
                 type = ChartType.VerticalBar,
-                layout = TitleConfig(true, "${seaWaterInfo.value.first().obs_datetime}  Surface Temperature"),
+                layout = TitleConfig(true, "${tempData.first().obs_datetime}  Surface Temperature"),
                 legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig(
                     legendTitle,
@@ -101,30 +104,32 @@ fun OceanWaterInfoBarChart(){
         }
     }
 
+    if (isVisible) {
     Column (modifier = paddingMod) {
-        if (isVisible) {
-            Row {
-                SEA_AREA.GRU_NAME.entries.forEach { entrie ->
-                    Row(
-                        Modifier
-                            .selectable(
-                                selected = (entrie == selectedOption),
-                                onClick = { selectedOption = entrie }
-                            )
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
+
+        Row {
+            SEA_AREA.GRU_NAME.entries.forEach { entrie ->
+                Row(
+                    Modifier
+                        .selectable(
                             selected = (entrie == selectedOption),
                             onClick = { selectedOption = entrie }
                         )
-                        Text(
-                            text = entrie.name,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = (entrie == selectedOption),
+                        onClick = { selectedOption = entrie }
+                    )
+                    Text(
+                        text = entrie.name,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
                 }
             }
+        }
+
             ComposePlot(
                 layout = chartLayout.value,
                 data = values.value,
