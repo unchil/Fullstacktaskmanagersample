@@ -1,6 +1,7 @@
 package com.unchil.full_stack_task_manager_sample.chart
 
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import androidx.compose.material3.TooltipScope
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -130,16 +132,14 @@ fun ComposePlot(
                 XYGraph(
                     xAxisModel = when (layout.type) {
                         ChartType.Line -> layout.xAxis.model as DoubleLinearAxisModel
-                        ChartType.VerticalBar, ChartType.BoxPlot -> layout.xAxis.model as CategoryAxisModel<Any>
-                        ChartType.GroupVerticalBar -> layout.xAxis.model as CategoryAxisModel<Any>
-                        ChartType.XYGraph -> layout.xAxis.model as CategoryAxisModel<Any>
+                        ChartType.VerticalBar, ChartType.BoxPlot, ChartType.GroupVerticalBar, ChartType.XYGraph -> {
+                            layout.xAxis.model as CategoryAxisModel<Any>
+                        }
                     },
                     yAxisModel = when (layout.type) {
-                        ChartType.XYGraph -> layout.yAxis.model as FloatLinearAxisModel
-                        ChartType.VerticalBar -> layout.yAxis.model as FloatLinearAxisModel
-                        ChartType.BoxPlot -> layout.yAxis.model as FloatLinearAxisModel
-                        ChartType.GroupVerticalBar -> layout.yAxis.model as FloatLinearAxisModel
-                        ChartType.Line -> layout.yAxis.model as FloatLinearAxisModel
+                        ChartType.XYGraph, ChartType.VerticalBar, ChartType.BoxPlot,ChartType.GroupVerticalBar, ChartType.Line -> {
+                            layout.yAxis.model as FloatLinearAxisModel
+                        }
                     },
                     xAxisContent = AxisContent(
                         labels = {
@@ -152,8 +152,6 @@ fun ComposePlot(
                                         AxisLabel(formatLongToDateTime(it), Modifier.padding(top = 2.dp))
                                     }
                                 }
-
-
                             }
                         },
                         title = {
@@ -234,8 +232,6 @@ fun ComposePlot(
                             val scope = this as XYGraphScope<Int, Float>
                             scope.GroupVerticalBarChart(data, xValues,layout.tooltips.isTooltips, colors  )
                         }
-
-
 
                         ChartType.XYGraph -> TODO()
                     }
@@ -387,11 +383,25 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
     val data = (data as List<SeaWaterBoxPlotStat>)
     val xValues = (xValues as List<String>)
 
-    val barWidth = when(range){
-        BoxPlotRange.Q1_Q3 -> 0.5f
-        BoxPlotRange.MIN_MAX  -> 0.05f
-        BoxPlotRange.MIN, BoxPlotRange.MAX -> 0.2f
-        BoxPlotRange.Q2 -> 0.4f
+    val index = remember { mutableIntStateOf(0) }
+
+    val barInfo = when(range){
+        BoxPlotRange.Q1_Q3 -> {
+            Pair(0.5f, BorderStroke(1.dp, Color.Gray))
+        }
+        BoxPlotRange.MIN_MAX  -> {
+            Pair(0.01f, null)
+        }
+        BoxPlotRange.MIN -> {
+            Pair(0.15f, null)
+        }
+        BoxPlotRange.MAX ->{
+            Pair(0.15f, null)
+        }
+        BoxPlotRange.Q2 -> {
+            Pair( 0.4f, BorderStroke(0.5.dp, Color.Red))
+        }
+
     }
 
     val values : List<VerticalBarPlotEntry<String, Float>> = when(range){
@@ -454,7 +464,7 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
                          DefaultVerticalBarPlotEntry(
 
                              xValues[index],
-                             DefaultBarPosition(seaWaterBoxPlotStat.median - 0.05f, seaWaterBoxPlotStat.median + 0.05f)
+                             DefaultBarPosition(seaWaterBoxPlotStat.median - 0.025f, seaWaterBoxPlotStat.median + 0.025f)
                          )
                      )
                  }
@@ -464,18 +474,19 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
 
     VerticalBarPlot(
         values,
-        bar = { index, _, _ ->
+        bar = { i, _, _ ->
 
             val color = when(range){
-                BoxPlotRange.Q1_Q3 -> colors[xValues[index]] ?: Color.Black
-                BoxPlotRange.MIN_MAX -> colors[xValues[index]] ?: Color.Black
-                BoxPlotRange.MIN, BoxPlotRange.MAX -> Color.Black
-                BoxPlotRange.Q2 -> Color.Yellow
+                BoxPlotRange.Q1_Q3 -> colors[xValues[i]] ?: Color.Black
+                BoxPlotRange.MIN_MAX -> colors[xValues[i]] ?: Color.Black
+                BoxPlotRange.MIN, BoxPlotRange.MAX -> Color.Gray
+                BoxPlotRange.Q2 -> Color.Transparent
             }
 
             DefaultBar(
                 brush = SolidColor(color ),
                 modifier = Modifier.fillMaxWidth(),
+                border = barInfo.second
             ) {
                 if (usableTooltips) {
 
@@ -487,12 +498,12 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
                         contentAlignment = Alignment.Center
                     ) {
                         Column{
-                            BoxPlotTooltips(values[index].x)
-                            BoxPlotTooltips("max:${data[index].max}")
-                            BoxPlotTooltips("75%:${data[index].q3}")
-                            BoxPlotTooltips("50%:${data[index].median}")
-                            BoxPlotTooltips("25%:${data[index].q1}")
-                            BoxPlotTooltips("min:${data[index].min}")
+                            BoxPlotTooltips(values[i].x)
+                            BoxPlotTooltips("max:${data[i].max}")
+                            BoxPlotTooltips("75%:${data[i].q3}")
+                            BoxPlotTooltips("50%:${data[i].median}")
+                            BoxPlotTooltips("25%:${data[i].q1}")
+                            BoxPlotTooltips("min:${data[i].min}")
 
                         }
 
@@ -501,7 +512,7 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
             }
 
         },
-        barWidth = barWidth
+        barWidth = barInfo.first
     )
 
 }
@@ -544,8 +555,8 @@ fun XYGraphScope<String, Float>.BoxPlotOutliers(
                 ) {
                     Symbol(
                         shape = ShapeDefaults.ExtraSmall,
-                        fillBrush = SolidColor(colors[xValues[index]] ?: Color.Black),
-                        size = 4.dp,
+                        fillBrush = SolidColor(Color.Gray.copy(alpha = 0.5f)),
+                        size = 6.dp,
                     )
                 }
             },

@@ -19,12 +19,12 @@ kotlin {
     iosSimulatorArm64()
     
     jvm()
-    /*
+
     js {
         browser()
     }
 
-     */
+
     
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -52,7 +52,7 @@ kotlin {
         }
 
         wasmJsMain.dependencies {
-            //   implementation(libs.ktor.client.cio)
+               implementation(libs.ktor.clientCio)
         }
 
         iosMain.dependencies {

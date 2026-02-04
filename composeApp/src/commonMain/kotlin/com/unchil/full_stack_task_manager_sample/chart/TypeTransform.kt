@@ -205,8 +205,8 @@ fun List<SeawaterInformationByObservationPoint>.toBarChartMap(): Map<String, Lis
 
 
 
-fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap():Map<String, List<Any>> {
-    val result =  this.filter { it.obs_lay.equals("1") }.map {
+fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap( gruName: String):Map<String, List<Any>> {
+    val result =  this.filter { it.gru_nam == gruName && it.obs_lay.equals("1") }.map {
         Pair(
             it.sta_nam_kor,
             it.wtr_tmp.trim().toFloatOrNull() ?: 0f
