@@ -399,7 +399,7 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
             Pair(0.15f, null)
         }
         BoxPlotRange.Q2 -> {
-            Pair( 0.4f, BorderStroke(0.5.dp, Color.Red))
+            Pair( 0.4f, null)
         }
 
     }
@@ -480,7 +480,7 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
                 BoxPlotRange.Q1_Q3 -> colors[xValues[i]] ?: Color.Black
                 BoxPlotRange.MIN_MAX -> colors[xValues[i]] ?: Color.Black
                 BoxPlotRange.MIN, BoxPlotRange.MAX -> Color.Gray
-                BoxPlotRange.Q2 -> Color.Transparent
+                BoxPlotRange.Q2 -> Color.White
             }
 
             DefaultBar(
