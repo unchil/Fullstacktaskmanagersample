@@ -466,9 +466,6 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
         values,
         bar = { index, _, _ ->
 
-            val text =
-                "${values[index].x}\nmax:${data[index].max}\nq3:${data[index].q3}\nq2:${data[index].median}\nq1:${data[index].q1}\nmin:${data[index].min}"
-
             val color = when(range){
                 BoxPlotRange.Q1_Q3 -> colors[xValues[index]] ?: Color.Black
                 BoxPlotRange.MIN_MAX -> colors[xValues[index]] ?: Color.Black
@@ -500,10 +497,6 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
                         }
 
                     }
-
-
-
-
                 }
             }
 
