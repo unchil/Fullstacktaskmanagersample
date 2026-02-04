@@ -70,10 +70,7 @@ fun OceanWaterInfoBarChart(){
              it.gru_nam.equals(selectedOption.gru_nam()) &&  it.obs_lay == "1"
          }
 
-
         isVisible = tempData.size > 0
-
-        if(selectedOption == SEA_AREA.GRU_NAME.SOUTH) isVisible = false
 
         if(isVisible){
             val legendTitle = "Observatory"
