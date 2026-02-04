@@ -104,7 +104,7 @@ fun OceanWaterInfoLineChart(){
     }
 
 
-    if (isVisible) {
+
     Column (modifier = paddingMod) {
 
             Row {
@@ -129,6 +129,7 @@ fun OceanWaterInfoLineChart(){
                     }
                 }
             }
+        if (isVisible) {
             ComposePlot(
                 layout = chartLayout.value,
                 data = rawData.value,

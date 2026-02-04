@@ -69,7 +69,11 @@ fun OceanWaterInfoBarChart(){
          val tempData = seaWaterInfo.value.filter {
              it.gru_nam.equals(selectedOption.gru_nam()) &&  it.obs_lay == "1"
          }
+
+
         isVisible = tempData.size > 0
+
+        if(selectedOption == SEA_AREA.GRU_NAME.SOUTH) isVisible = false
 
         if(isVisible){
             val legendTitle = "Observatory"
@@ -104,7 +108,7 @@ fun OceanWaterInfoBarChart(){
         }
     }
 
-    if (isVisible) {
+
     Column (modifier = paddingMod) {
 
         Row {
@@ -129,6 +133,7 @@ fun OceanWaterInfoBarChart(){
                 }
             }
         }
+        if (isVisible) {
 
             ComposePlot(
                 layout = chartLayout.value,
