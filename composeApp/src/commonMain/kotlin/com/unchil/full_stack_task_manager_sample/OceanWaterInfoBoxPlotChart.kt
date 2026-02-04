@@ -22,6 +22,7 @@ import com.unchil.full_stack_task_manager_sample.chart.AxisConfig
 import com.unchil.full_stack_task_manager_sample.chart.CaptionConfig
 import com.unchil.full_stack_task_manager_sample.chart.ChartType
 import com.unchil.full_stack_task_manager_sample.chart.ComposePlot
+import com.unchil.full_stack_task_manager_sample.chart.EmptyChart
 import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.SizeConfig
@@ -70,7 +71,7 @@ fun OceanWaterInfoBoxPlotChart(){
         }
         isVisible = tempData.size > 0
 
-
+        //if(selectedOption.gru_nam() == "남해") isVisible = false
 
         if(isVisible){
             val legendTitle = "Observatory"
@@ -147,6 +148,14 @@ fun OceanWaterInfoBoxPlotChart(){
                 data = values.value,
                 xValues = xValue.value,
                 entries = entries.value
+            )
+        }else{
+            EmptyChart(
+                400.dp,
+                "Surface Temperature 24-Hour Stat",
+                "Observatory",
+                "Water Temperature °C",
+                "from https://www.nifs.go.kr (National Institute of Fisheries Science)"
             )
         }
     }

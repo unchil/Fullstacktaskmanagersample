@@ -18,25 +18,24 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.unchil.full_stack_task_manager_sample.chart.AxisConfig
 import com.unchil.full_stack_task_manager_sample.chart.CaptionConfig
 import com.unchil.full_stack_task_manager_sample.chart.ChartType
 import com.unchil.full_stack_task_manager_sample.chart.ComposePlot
+import com.unchil.full_stack_task_manager_sample.chart.EmptyChart
 import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.SizeConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
-import com.unchil.full_stack_task_manager_sample.viewmodel.MofSeaWaterInfoViewModel
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.desc
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.name
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.unit
 import com.unchil.full_stack_task_manager_sample.chart.toMofLineMap
+import com.unchil.full_stack_task_manager_sample.viewmodel.MofSeaWaterInfoViewModel
 import io.github.koalaplot.core.xygraph.AxisModel
 import io.github.koalaplot.core.xygraph.AxisStyle
-import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.DoubleLinearAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import kotlinx.coroutines.delay
@@ -79,6 +78,8 @@ fun OceanWaterInfoLineChart_MOF(){
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
 
         isVisible = seaWaterInfo.value.isNotEmpty()
+
+     //   if(selectedOption.name() == "Electrical Conductivity") isVisible = false
 
         if(isVisible) {
 
@@ -152,7 +153,7 @@ fun OceanWaterInfoLineChart_MOF(){
 
                 ),
                 yAxis = AxisConfig(
-                    "${selectedOption.unit()}",
+                    selectedOption.unit(),
                     model = FloatLinearAxisModel(range.value) as AxisModel<Any>
                 ),
                 caption = CaptionConfig(true,
@@ -164,6 +165,7 @@ fun OceanWaterInfoLineChart_MOF(){
     }
 
     Column (modifier = paddingMod) {
+
         if (isVisible) {
 
             ComposePlot(
@@ -172,6 +174,15 @@ fun OceanWaterInfoLineChart_MOF(){
                 xValues = xValue.value,
                 entries = entries.value
             )
+        }else{
+            EmptyChart(
+                500.dp,
+                "24-hour Ocean Water Information (${selectedOption.name()})",
+                "",
+                selectedOption.unit(),
+                "from https://www.mof.go.kr (Ministry of Oceans and Fisheries)"
+            )
+        }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -199,7 +210,7 @@ fun OceanWaterInfoLineChart_MOF(){
                 }
             }
 
-        }
+
     }
 
 

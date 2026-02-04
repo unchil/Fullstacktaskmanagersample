@@ -22,6 +22,7 @@ import com.unchil.full_stack_task_manager_sample.chart.AxisConfig
 import com.unchil.full_stack_task_manager_sample.chart.CaptionConfig
 import com.unchil.full_stack_task_manager_sample.chart.ChartType
 import com.unchil.full_stack_task_manager_sample.chart.ComposePlot
+import com.unchil.full_stack_task_manager_sample.chart.EmptyChart
 import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
@@ -29,7 +30,6 @@ import com.unchil.full_stack_task_manager_sample.chart.toLineMap
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
 import io.github.koalaplot.core.xygraph.AxisModel
 import io.github.koalaplot.core.xygraph.AxisStyle
-import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.DoubleLinearAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import kotlinx.coroutines.delay
@@ -70,6 +70,7 @@ fun OceanWaterInfoLineChart(){
         }
         isVisible = tempData.size > 0
 
+      //  if(selectedOption.gru_nam() == "남해") isVisible = false
 
         if(isVisible) {
 
@@ -137,6 +138,14 @@ fun OceanWaterInfoLineChart(){
                 entries = entries.value
             )
 
+        }else{
+            EmptyChart(
+                400.dp,
+                "24-hour Surface Sea Temperature",
+                "",
+                "Water Temperature °C",
+                "from https://www.nifs.go.kr (National Institute of Fisheries Science)"
+            )
         }
     }
 

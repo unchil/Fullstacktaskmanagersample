@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -66,11 +68,16 @@ import io.github.koalaplot.core.legend.ColumnLegend
 import io.github.koalaplot.core.legend.ColumnLegend2
 import io.github.koalaplot.core.legend.FlowLegend2
 import io.github.koalaplot.core.legend.LegendLocation
+import io.github.koalaplot.core.line.AreaBaseline
+import io.github.koalaplot.core.line.AreaPlot
+import io.github.koalaplot.core.line.LinePlot
 import io.github.koalaplot.core.line.LinePlot2
+import io.github.koalaplot.core.style.AreaStyle
 import io.github.koalaplot.core.style.KoalaPlotTheme
 import io.github.koalaplot.core.style.LineStyle
 import io.github.koalaplot.core.util.ExperimentalKoalaPlotApi
 import io.github.koalaplot.core.util.VerticalRotation
+import io.github.koalaplot.core.util.generateHueColorPalette
 import io.github.koalaplot.core.util.rotateVertically
 import io.github.koalaplot.core.util.toString
 import io.github.koalaplot.core.xygraph.AxisContent
@@ -80,9 +87,15 @@ import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.DefaultPoint
 import io.github.koalaplot.core.xygraph.DoubleLinearAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
+import io.github.koalaplot.core.xygraph.GridStyle
+import io.github.koalaplot.core.xygraph.Point
 import io.github.koalaplot.core.xygraph.XYGraph
 import io.github.koalaplot.core.xygraph.XYGraphScope
+import io.github.koalaplot.core.xygraph.autoScaleXRange
+import io.github.koalaplot.core.xygraph.autoScaleYRange
 import io.github.koalaplot.core.xygraph.rememberAxisStyle
+import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
+import kotlin.math.pow
 import kotlin.toString
 
 
@@ -240,9 +253,6 @@ fun ComposePlot(
 
 
             }
-
-
-
 
         } //-- ChartLayout
 
@@ -650,6 +660,87 @@ fun XYGraphScope<String, Float>.VerticalBarChart(
         },
         barWidth = barWidth
     )
+}
+
+@OptIn(ExperimentalKoalaPlotApi::class)
+@Composable
+fun EmptyChart(
+    height: Dp = 400.dp,
+    title:String? = null,
+    xTitle:String? = null,
+    yTitle:String? = null,
+    caption:String? = null,
+ ){
+
+    Box( modifier = Modifier.fillMaxWidth()
+        .height(height)
+        .background(color = MaterialTheme.colorScheme.background),
+        contentAlignment =  Alignment.Center
+    ) {
+
+        ChartLayout(
+            modifier = Modifier.padding(16.dp),
+            title = { Text(title ?: "", style = MaterialTheme.typography.titleLarge) },
+            legend = {},
+            legendLocation = LegendLocation.LEFT
+        ) {
+            XYGraph(
+                xAxisModel = FloatLinearAxisModel(
+                    0f..10f,
+                    minimumMajorTickSpacing = 50.dp,
+                ),
+                yAxisModel =
+                    FloatLinearAxisModel(
+                        0f..10f,
+                        minimumMajorTickSpacing = 50.dp,
+                    ),
+                xAxisContent =
+                    AxisContent(
+                        labels = {
+                            AxisLabel(it.toString(), Modifier.padding(top = 2.dp))
+                        },
+                        title = {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                AxisTitle(xTitle ?: "")
+                            }
+                        },
+                        style = rememberAxisStyle(),
+                    ),
+                yAxisContent =
+                    AxisContent(
+                        labels = {
+                            AxisLabel(it.toString(), Modifier.absolutePadding(right = 2.dp))
+                        },
+                        title = {
+                            Box(
+                                modifier = Modifier.fillMaxHeight(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                AxisTitle(
+                                    yTitle ?: "",
+                                    modifier = Modifier
+                                        .rotateVertically(VerticalRotation.COUNTER_CLOCKWISE)
+                                        .padding(bottom = padding),
+                                )
+                            }
+
+                        },
+                        style = rememberAxisStyle(),
+                    )
+            ) { }
+        }
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment =  Alignment.BottomEnd
+        ) {
+            CaptionText(caption ?: "", modifier = paddingMod)
+        }
+    }
+
 }
 
 
