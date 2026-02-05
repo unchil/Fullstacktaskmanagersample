@@ -58,56 +58,69 @@ fun OceanWaterInfoBoxPlotChart(){
 
     val seaWaterInfo = viewModel._seaWaterInfo.collectAsState()
 
-    val data = remember { mutableStateOf(mapOf<String, List<*>?>() ) }
+
     val entries = remember { mutableStateOf(emptyList<String>() ) }
     val xValue = remember { mutableStateOf(emptyList<String>()) }
     val values = remember { mutableStateOf(emptyList<SeaWaterBoxPlotStat>() ) }
     val chartLayout = remember { mutableStateOf(LayoutData() )}
-    val range = remember { mutableStateOf(0f..25f)}
+    val chartHeight = remember {400.dp}
+    val chartTitle = remember {"Surface Temperature 24-Hour Stat"}
+    val chartXTitle = remember { "Observatory"}
+    val chartYTitle = remember { "Water Temperature °C"}
+    val chartCaption = remember {"from https://www.nifs.go.kr (National Institute of Fisheries Science)"}
+
+
+
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
 
-        val tempData = seaWaterInfo.value.filter {
+        val filteredList = seaWaterInfo.value.filter {
             it.gru_nam.equals(selectedOption.gru_nam()) &&  it.obs_lay == "1"
         }
-        isVisible = tempData.size > 0
-
-        //if(selectedOption.gru_nam() == "남해") isVisible = false
+        isVisible = filteredList.isNotEmpty()
 
         if(isVisible){
-            val legendTitle = "Observatory"
-            data.value = tempData.toBoxPlotMap()
-            entries.value = data.value["entries"] as List<String>
-            xValue.value = entries.value
-            values.value = data.value["values"] as List<SeaWaterBoxPlotStat>
 
-            val yMax = values.value.maxOfOrNull {
+            val chartData = filteredList.toBoxPlotMap()
+            val currentEntries = chartData["entries"] as? List<String> ?: emptyList()
+            val currentValues = chartData["values"] as? List<SeaWaterBoxPlotStat> ?: emptyList()
+
+            // 상태 업데이트
+            xValue.value = currentEntries
+            entries.value = currentEntries
+            values.value = currentValues
+
+            val yMax = currentValues.maxOfOrNull {
                 it.max
             } ?: 0f
 
-            range.value = 0f..(yMax + (yMax * 0.1f) )
+            val range = 0f..(yMax * 1.1f)
 
             chartLayout.value = LayoutData(
                 type = ChartType.BoxPlot,
-                layout = TitleConfig(true, "Surface Temperature 24-Hour Stat"),
-                legend = LegendConfig(true, true, legendTitle),
+                layout = TitleConfig(true, chartTitle),
+                legend = LegendConfig(true, true, chartXTitle),
                 xAxis = AxisConfig(
-                    legendTitle,
-               //     range = range.value,
-                    //   model = FloatLinearAxisModel( 0.5f..(rawData.value.size.toFloat() + 0.5f))
+                    chartXTitle,
                     model = CategoryAxisModel(xValue.value),
                     style = AxisStyle(labelRotation = 45)
                 ),
                 yAxis = AxisConfig(
-                    "Water Temperature °C",
-                    range = range.value,
-                    model = FloatLinearAxisModel(range.value) as AxisModel<Any>
+                    chartYTitle,
+                    model = FloatLinearAxisModel(range) as AxisModel<Any>
                 ),
                 size = SizeConfig(height = 400.dp),
-                caption = CaptionConfig(true,
-                    "from https://www.nifs.go.kr (National Institute of Fisheries Science)"
-                ),
+                caption = CaptionConfig(true,chartCaption  ),
             )
 
+        } else {
+            chartLayout.value = LayoutData(
+                layout = TitleConfig(true, chartTitle),
+                legend = LegendConfig(false, true, chartXTitle),
+                xAxis = AxisConfig(chartXTitle),
+                yAxis = AxisConfig( chartYTitle),
+                size = SizeConfig(height = chartHeight),
+                caption = CaptionConfig(true,  chartCaption  )
+            )
         }
 
 
@@ -150,13 +163,7 @@ fun OceanWaterInfoBoxPlotChart(){
                 entries = entries.value
             )
         }else{
-            EmptyChart(
-                400.dp,
-                "Surface Temperature 24-Hour Stat",
-                "Observatory",
-                "Water Temperature °C",
-                "from https://www.nifs.go.kr (National Institute of Fisheries Science)"
-            )
+            EmptyChart(chartLayout.value )
         }
     }
 

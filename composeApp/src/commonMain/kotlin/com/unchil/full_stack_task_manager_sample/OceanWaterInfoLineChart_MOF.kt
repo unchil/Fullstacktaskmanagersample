@@ -65,102 +65,113 @@ fun OceanWaterInfoLineChart_MOF(){
 
     val entries = remember { mutableStateOf(emptyList<String>() ) }
     val xValue = remember { mutableStateOf(emptyList<Double>()) }
-    val rawData = remember { mutableStateOf(mapOf<String, List<Float>>() ) }
+    val values = remember { mutableStateOf(mapOf<String, List<Float>>() ) }
     val chartLayout = remember { mutableStateOf(LayoutData() )}
-    val range = remember { mutableStateOf(0f..0f)}
+
 
     val maxTurbidity = remember { 500f}
     val minElectricalConductivity = remember { 20f}
     val minDissolvedOxygen = remember { 7f }
     val minSalinity = remember { 15f }
     val minHydrogenIonConcentration = remember { 6f }
+    val chartHeight = remember {500.dp}
+    val chartTitle = remember {"24-hour Ocean Water Information"}
+    val chartXTitle = remember { "DateTime"}
+    val chartCaption = remember {"from https://www.mof.go.kr (Ministry of Oceans and Fisheries)"}
+
 
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
 
         isVisible = seaWaterInfo.value.isNotEmpty()
 
-     //   if(selectedOption.name() == "Electrical Conductivity") isVisible = false
-
         if(isVisible) {
 
             val legendTitle = "Observatory"
-            val data = seaWaterInfo.value.toMofLineMap(selectedOption)
-            entries.value = data["entries"] as List<String>
-            xValue.value = data["xValue" ] as List<Double>
-            rawData.value = data["values" ] as Map<String, List<Float>>
+            val chartData = seaWaterInfo.value.toMofLineMap(selectedOption)
+
+            val currentEntries = chartData["entries"] as? List<String> ?: emptyList()
+            val currentXValues = chartData["xValue" ] as? List<Double> ?: emptyList()
+            val currentValues = chartData["values" ] as? Map<String, List<Float>> ?: mapOf()
+
+            // 상태 업데이트
+            xValue.value = currentXValues
+            entries.value = currentEntries
+            values.value = currentValues
 
 
             val min = when(selectedOption){
-                WATER_QUALITY.QualityType.rtmWtchWtem -> rawData.value.minOf { it.value.minOf { it } }
+                WATER_QUALITY.QualityType.rtmWtchWtem -> currentValues.minOf { it.value.minOf { it } }
                 WATER_QUALITY.QualityType.rtmWqCndctv -> {
-                    if( rawData.value.minOf { it.value.minOf { it } } < minElectricalConductivity) {
+                    if( currentValues.minOf { it.value.minOf { it } } < minElectricalConductivity) {
                         minElectricalConductivity
                     } else {
-                        rawData.value.minOf { it.value.minOf { it } }
+                        currentValues.minOf { it.value.minOf { it } }
                     }
                 }
                 WATER_QUALITY.QualityType.ph -> {
-                    if( rawData.value.minOf { it.value.minOf { it } } < minHydrogenIonConcentration) {
+                    if( currentValues.minOf { it.value.minOf { it } } < minHydrogenIonConcentration) {
                         minHydrogenIonConcentration
                     } else {
-                        rawData.value.minOf { it.value.minOf { it } }
+                        currentValues.minOf { it.value.minOf { it } }
                     }
                 }
                 WATER_QUALITY.QualityType.rtmWqDoxn -> {
-                    if( rawData.value.minOf { it.value.minOf { it } } < minDissolvedOxygen) {
+                    if( currentValues.minOf { it.value.minOf { it } } < minDissolvedOxygen) {
                         minDissolvedOxygen
                     } else {
-                        rawData.value.minOf { it.value.minOf { it } }
+                        currentValues.minOf { it.value.minOf { it } }
                     }
                 }
-                WATER_QUALITY.QualityType.rtmWqTu -> rawData.value.minOf { it.value.minOf { it } }
-                WATER_QUALITY.QualityType.rtmWqChpla -> rawData.value.minOf { it.value.minOf { it } }
+                WATER_QUALITY.QualityType.rtmWqTu -> currentValues.minOf { it.value.minOf { it } }
+                WATER_QUALITY.QualityType.rtmWqChpla -> currentValues.minOf { it.value.minOf { it } }
                 WATER_QUALITY.QualityType.rtmWqSlnty -> {
-                    if( rawData.value.minOf { it.value.minOf { it } } < minSalinity) {
+                    if( currentValues.minOf { it.value.minOf { it } } < minSalinity) {
                         minSalinity
                     } else {
-                        rawData.value.minOf { it.value.minOf { it } }
+                        currentValues.minOf { it.value.minOf { it } }
                     }
                 }
             }
-
             val max = when(selectedOption){
                 WATER_QUALITY.QualityType.rtmWqTu -> {
-                    if( rawData.value.maxOf { it.value.maxOf { it } } > maxTurbidity) {
+                    if( currentValues.maxOf { it.value.maxOf { it } } > maxTurbidity) {
                         maxTurbidity
                     } else {
-                        rawData.value.maxOf { it.value.maxOf { it } }
+                        currentValues.maxOf { it.value.maxOf { it } }
                     }
                 }
                 else -> {
-                    rawData.value.maxOf { it.value.maxOf { it } }
+                    currentValues.maxOf { it.value.maxOf { it } }
                 }
             }
-
-            range.value =  min..( max + (max * 0.1f) )
-
-
+            val range =  min..( max * 1.1f )
             val xRange = xValue.value.min()..xValue.value.max()
 
             chartLayout.value = LayoutData(
-                size = SizeConfig(height = 500.dp),
+                size = SizeConfig(chartHeight),
                 type = ChartType.Line,
-                layout = TitleConfig(true, "24-hour Ocean Water Information (${selectedOption.name()})", description = selectedOption.desc()),
+                layout = TitleConfig(true, "${chartTitle} (${selectedOption.name()})", description = selectedOption.desc()),
                 legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig(
                     model = DoubleLinearAxisModel(xRange) as AxisModel<Any>,
                     style = AxisStyle(labelRotation = 0),
-
                 ),
                 yAxis = AxisConfig(
                     selectedOption.unit(),
-                    model = FloatLinearAxisModel(range.value) as AxisModel<Any>
+                    model = FloatLinearAxisModel(range) as AxisModel<Any>
                 ),
-                caption = CaptionConfig(true,
-                    "from https://www.mof.go.kr (Ministry of Oceans and Fisheries)"
-                ),
+                caption = CaptionConfig(true,chartCaption  ),
             )
 
+        }else {
+            chartLayout.value = LayoutData(
+                layout = TitleConfig(true, chartTitle),
+                legend = LegendConfig(false, true, chartXTitle),
+                xAxis = AxisConfig(chartXTitle),
+                yAxis = AxisConfig( selectedOption.unit()),
+                size = SizeConfig(height = chartHeight),
+                caption = CaptionConfig(true,  chartCaption  )
+            )
         }
     }
 
@@ -170,18 +181,12 @@ fun OceanWaterInfoLineChart_MOF(){
 
             ComposePlot(
                 layout = chartLayout.value,
-                data = rawData.value,
+                data = values.value,
                 xValues = xValue.value,
                 entries = entries.value
             )
         }else{
-            EmptyChart(
-                500.dp,
-                "24-hour Ocean Water Information (${selectedOption.name()})",
-                "",
-                selectedOption.unit(),
-                "from https://www.mof.go.kr (Ministry of Oceans and Fisheries)"
-            )
+            EmptyChart(chartLayout.value )
         }
 
             Row(

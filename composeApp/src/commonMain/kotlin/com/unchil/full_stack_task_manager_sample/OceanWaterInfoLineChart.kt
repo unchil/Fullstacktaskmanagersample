@@ -25,6 +25,7 @@ import com.unchil.full_stack_task_manager_sample.chart.ComposePlot
 import com.unchil.full_stack_task_manager_sample.chart.EmptyChart
 import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
+import com.unchil.full_stack_task_manager_sample.chart.SizeConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
 import com.unchil.full_stack_task_manager_sample.chart.toLineMap
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
@@ -60,47 +61,64 @@ fun OceanWaterInfoLineChart(){
 
     val entries = remember { mutableStateOf(emptyList<String>() ) }
     val xValue = remember { mutableStateOf(emptyList<Double>()) }
-    val rawData = remember { mutableStateOf(mapOf<String, List<Float>>() ) }
+    val values = remember { mutableStateOf(mapOf<String, List<Float>>() ) }
     val chartLayout = remember { mutableStateOf(LayoutData() )}
-    val range = remember { mutableStateOf(0f..0f)}
+    val chartHeight = remember {400.dp}
+    val chartTitle = remember {"24-hour Surface Sea Temperature"}
+    val chartXTitle = remember { "DateTime"}
+    val chartYTitle = remember { "Water Temperature °C"}
+    val chartCaption = remember {"from https://www.nifs.go.kr (National Institute of Fisheries Science)"}
+
 
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
-        val tempData = seaWaterInfo.value.filter {
+
+        val filteredList = seaWaterInfo.value.filter {
             it.gru_nam.equals(selectedOption.gru_nam()) &&  it.obs_lay == "1"
         }
-        isVisible = tempData.size > 0
-
-      //  if(selectedOption.gru_nam() == "남해") isVisible = false
+        isVisible = filteredList.isNotEmpty()
 
         if(isVisible) {
 
-            val legendTitle = "Observatory"
-            val data = tempData.toLineMap()
-            entries.value = data["entries"] as List<String>
-            xValue.value = data["xValue" ] as List<Double>
-            rawData.value = data["values" ] as Map<String, List<Float>>
-            val max = rawData.value.maxOf { it.value.maxOf { it } }
-            range.value =  0f..( max + (max * 0.1f) )
+            val chartData = filteredList.toLineMap()
 
-            val xRange = xValue.value.min()..xValue.value.max()
+            val currentEntries = chartData["entries"] as? List<String> ?: emptyList()
+            val currentXValues = chartData["xValue" ] as? List<Double>?: emptyList()
+            val currentValues = chartData["values" ] as? Map<String, List<Float>> ?: mapOf()
+
+            // 상태 업데이트
+            xValue.value = currentXValues
+            entries.value = currentEntries
+            values.value = currentValues
+
+            val yMax = currentValues.maxOf { it.value.maxOf { it } }
+            val range = 0f..(yMax * 1.1f)
+            val xRange = currentXValues.min()..currentXValues.max()
 
             chartLayout.value = LayoutData(
                 type = ChartType.Line,
-                layout = TitleConfig(true, "24-hour Surface Sea Temperature"),
-                legend = LegendConfig(true, true, legendTitle),
+                layout = TitleConfig(true, chartTitle),
+                legend = LegendConfig(true, true, "Observatory"),
+                size = SizeConfig(height = chartHeight),
                 xAxis = AxisConfig(
                     model = DoubleLinearAxisModel(xRange) as AxisModel<Any>,
                     style = AxisStyle(labelRotation = 0)
                 ),
                 yAxis = AxisConfig(
-                    "Water Temperature °C",
-                    model = FloatLinearAxisModel(range.value) as AxisModel<Any>
+                    chartYTitle,
+                    model = FloatLinearAxisModel(range) as AxisModel<Any>
                 ),
-                caption = CaptionConfig(true,
-                    "from https://www.nifs.go.kr (National Institute of Fisheries Science)"
-                ),
+                caption = CaptionConfig(true,chartCaption ),
             )
 
+        }else {
+            chartLayout.value = LayoutData(
+                layout = TitleConfig(true, chartTitle),
+                legend = LegendConfig(false, true, chartXTitle),
+                xAxis = AxisConfig(chartXTitle),
+                yAxis = AxisConfig( chartYTitle),
+                size = SizeConfig(height = chartHeight),
+                caption = CaptionConfig(true,  chartCaption  )
+            )
         }
     }
 
@@ -133,19 +151,13 @@ fun OceanWaterInfoLineChart(){
         if (isVisible) {
             ComposePlot(
                 layout = chartLayout.value,
-                data = rawData.value,
+                data = values.value,
                 xValues = xValue.value,
                 entries = entries.value
             )
 
         }else{
-            EmptyChart(
-                400.dp,
-                "24-hour Surface Sea Temperature",
-                "",
-                "Water Temperature °C",
-                "from https://www.nifs.go.kr (National Institute of Fisheries Science)"
-            )
+            EmptyChart(chartLayout.value )
         }
     }
 

@@ -664,23 +664,21 @@ fun XYGraphScope<String, Float>.VerticalBarChart(
 
 @OptIn(ExperimentalKoalaPlotApi::class)
 @Composable
-fun EmptyChart(
-    height: Dp = 400.dp,
-    title:String? = null,
-    xTitle:String? = null,
-    yTitle:String? = null,
-    caption:String? = null,
- ){
+fun EmptyChart(layoutData: LayoutData){
 
     Box( modifier = Modifier.fillMaxWidth()
-        .height(height)
+        .height(layoutData.size.height)
         .background(color = MaterialTheme.colorScheme.background),
         contentAlignment =  Alignment.Center
     ) {
 
         ChartLayout(
             modifier = Modifier.padding(16.dp),
-            title = { Text(title ?: "", style = MaterialTheme.typography.titleLarge) },
+            title = {
+                if(layoutData.layout.isTitle) {
+                    Text(layoutData.layout.title, style = MaterialTheme.typography.titleLarge)
+                }
+            },
             legend = {},
             legendLocation = LegendLocation.LEFT
         ) {
@@ -689,8 +687,7 @@ fun EmptyChart(
                     0f..10f,
                     minimumMajorTickSpacing = 50.dp,
                 ),
-                yAxisModel =
-                    FloatLinearAxisModel(
+                yAxisModel = FloatLinearAxisModel(
                         0f..10f,
                         minimumMajorTickSpacing = 50.dp,
                     ),
@@ -704,7 +701,9 @@ fun EmptyChart(
                                 modifier = Modifier.fillMaxWidth(),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                AxisTitle(xTitle ?: "")
+                                if(layoutData.xAxis.isTitle){
+                                    AxisTitle(layoutData.xAxis.title)
+                                }
                             }
                         },
                         style = rememberAxisStyle(),
@@ -719,25 +718,31 @@ fun EmptyChart(
                                 modifier = Modifier.fillMaxHeight(),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                AxisTitle(
-                                    yTitle ?: "",
-                                    modifier = Modifier
-                                        .rotateVertically(VerticalRotation.COUNTER_CLOCKWISE)
-                                        .padding(bottom = padding),
-                                )
+                                if(layoutData.yAxis.isTitle){
+                                    AxisTitle(
+                                        layoutData.yAxis.title,
+                                        modifier = Modifier
+                                            .rotateVertically(VerticalRotation.COUNTER_CLOCKWISE)
+                                            .padding(bottom = padding),
+                                    )
+                                }
                             }
-
                         },
                         style = rememberAxisStyle(),
                     )
-            ) { }
+            ) {
+
+            }
         }
 
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment =  Alignment.BottomEnd
         ) {
-            CaptionText(caption ?: "", modifier = paddingMod)
+            if(layoutData.caption.isCaption){
+                CaptionText(layoutData.caption.title, modifier = paddingMod)
+            }
+
         }
     }
 
