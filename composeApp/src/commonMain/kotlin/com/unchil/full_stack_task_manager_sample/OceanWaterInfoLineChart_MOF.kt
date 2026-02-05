@@ -32,9 +32,9 @@ import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.desc
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.name
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.unit
-import com.unchil.full_stack_task_manager_sample.chart.toMofLineMap
+import com.unchil.full_stack_task_manager_sample.chart.paddingMod
+import com.unchil.full_stack_task_manager_sample.chart.toMofLineTriple
 import com.unchil.full_stack_task_manager_sample.viewmodel.MofSeaWaterInfoViewModel
-import io.github.koalaplot.core.xygraph.AxisModel
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.DoubleLinearAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
@@ -87,11 +87,11 @@ fun OceanWaterInfoLineChart_MOF(){
         if(isVisible) {
 
             val legendTitle = "Observatory"
-            val chartData = seaWaterInfo.value.toMofLineMap(selectedOption)
+            val chartData = seaWaterInfo.value.toMofLineTriple(selectedOption)
 
-            val currentEntries = chartData["entries"] as? List<String> ?: emptyList()
-            val currentXValues = chartData["xValue" ] as? List<Double> ?: emptyList()
-            val currentValues = chartData["values" ] as? Map<String, List<Float>> ?: mapOf()
+            val currentEntries = chartData.first
+            val currentXValues = chartData.second
+            val currentValues = chartData.third
 
             // 상태 업데이트
             xValue.value = currentXValues

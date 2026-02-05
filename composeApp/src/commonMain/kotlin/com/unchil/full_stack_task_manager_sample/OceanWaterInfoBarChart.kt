@@ -27,7 +27,8 @@ import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.SizeConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
-import com.unchil.full_stack_task_manager_sample.chart.toBarChartMap
+import com.unchil.full_stack_task_manager_sample.chart.paddingMod
+import com.unchil.full_stack_task_manager_sample.chart.toBarChartTriple
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
@@ -78,9 +79,9 @@ fun OceanWaterInfoBarChart(){
 
         if(isVisible){
 
-            val chartData = filteredList.toBarChartMap()
-            val currentValues = chartData["values"] as? List<Float> ?: emptyList()
-            val currentEntries = chartData["entries"] as? List<String> ?: emptyList()
+            val chartData = filteredList.toBarChartTriple()
+            val currentValues = chartData.third
+            val currentEntries = chartData.first
 
             // 상태 업데이트
             xValue.value = currentEntries

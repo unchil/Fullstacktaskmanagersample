@@ -67,7 +67,6 @@ data class BarConfig(val widthWeight: Float = 0.8f)
 data class LayoutData(
 
     val type: ChartType = ChartType.XYGraph,
-  //  val category: List<String> = emptyList(),
     val layout: TitleConfig = TitleConfig(),
     val legend: LegendConfig = LegendConfig(),
     val xAxis: AxisConfig = AxisConfig(
@@ -106,8 +105,8 @@ enum class BoxPlotRange {
     MIN_MAX, Q1_Q3, Q2, MIN, MAX
 }
 
-internal val padding = 8.dp
-internal val paddingMod = Modifier.padding(padding)
+val padding = 8.dp
+val paddingMod = Modifier.padding(padding)
 
 
 
@@ -218,114 +217,6 @@ object WATER_QUALITY {
 
 }
 
-
-
-
-sealed class ChartData {
-
-    data class LineChartData(
-        val rawData:  Map<String, List<Any>>,
-        val legendTitle:String,
-    ) {
-        val entries = rawData[legendTitle]?.map { it.toString() } ?: emptyList()
-        val xValues = rawData.keys.filter { it != legendTitle }
-        val values = entries.mapIndexed { index, id ->
-            id to xValues.map { columnName ->
-                rawData[columnName]?.getOrNull(index) as? Double ?: 0.0
-            }
-        }.toMap()
-
-        val max = values.maxOf { it.value.maxOf { it } }
-        val min = values.minOf { it.value.minOf { it } }
-
-        val range =  0f..(ceil(max / 50.0) * 50.0).toFloat()
-
-        val chartLayout = LayoutData(
-            type = ChartType.Line,
-          //  category = xValues,
-            layout = TitleConfig(true, "Rain Fall"),
-            legend = LegendConfig(true, true, legendTitle),
-            xAxis = AxisConfig("Month", model = CategoryAxisModel(xValues)),
-            yAxis = AxisConfig(
-                "Rainfall (mm)",
-                range = range,
-                model = FloatLinearAxisModel(range) as AxisModel<Any>
-            ),
-            caption = CaptionConfig(true, "from www.worldclimate.com"),
-        )
-    }
-
-
-    data class BarChartData(
-        val rawData: List<Float>,
-        val legendTitle: String,
-    ) {
-        val entries = rawData.indices.map { "$legendTitle-${it+1}" }
-        val xValues = entries
-
-        val yMax = rawData.maxBy { it }
-        val range = 0f..(yMax + (yMax * 0.1f) )
-
-        val chartLayout = LayoutData(
-            type = ChartType.VerticalBar,
-         //   category = xValues,
-            layout = TitleConfig(true, "Fibonacci Sequence"),
-            legend = LegendConfig(true, true, legendTitle),
-            xAxis = AxisConfig(
-                "Position in Sequence",
-                range = 0.5f..(rawData.size.toFloat() + 0.5f),
-                model = FloatLinearAxisModel( 0.5f..(rawData.size.toFloat() + 0.5f)) as AxisModel<Any>
-            ),
-            yAxis = AxisConfig(
-                "Value",
-                range = range,
-                model = FloatLinearAxisModel(range) as AxisModel<Any>
-            ),
-            caption = CaptionConfig(true, "from The Koala Plot"),
-        )
-    }
-
-    data class GroupBarChartData(
-        val rawData: Map<String, List<Int>>,
-        val legendTitle: String,
-    ):ChartData(){
-        val entries = rawData.keys.toList()
-        val xValues = listOf(1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020)
-
-        val yMax by lazy {
-            rawData.maxOf { entry ->
-                entry.value.maxOf { it }
-            }
-        }
-        val yMin by lazy {
-            rawData.minOf { entry ->
-                entry.value.minOf { it }
-            }
-        }
-
-        val yRange = 0f..(yMax + (yMax * 0.1f) )
-
-        val chartLayout = LayoutData(
-            type = ChartType.GroupVerticalBar,
-        //    category = entries,
-            layout = TitleConfig(true, "Population (Millions)"),
-            legend = LegendConfig(true, true, legendTitle),
-            xAxis = AxisConfig(
-                "Year",
-                model = CategoryAxisModel( xValues)
-            ),
-            yAxis = AxisConfig(
-                "Population (Millions)",
-                range = yRange,
-                model = FloatLinearAxisModel(yRange) as  AxisModel<Any>
-            ),
-            caption = CaptionConfig(true, "from https://data.cityofnewyork.us/City-Government/New-York-City-Population-by-Borough-1950-2040/xywu-7bv9"),
-        )
-
-
-    }
-
-}
 
 
 

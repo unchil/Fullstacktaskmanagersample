@@ -7,15 +7,10 @@ import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservatio
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.toMap
-import kotlin.time.ExperimentalTime
 
 
 @OptIn(FormatStringsInDatetimeFormats::class)
@@ -38,7 +33,7 @@ fun formatLongToDateTime(millis: Any): String {
 
 
 @OptIn(FormatStringsInDatetimeFormats::class)
-fun List<*>.toMofLineMap(qualityType: WATER_QUALITY.QualityType):Map<String, Any> {
+fun List<SeaWaterInformation>.toMofLineTriple(qualityType: WATER_QUALITY.QualityType):Triple<List<String>, List<Double>, Map<String, List<Float>> >{
     val inputFormat = LocalDateTime.Format { byUnicodePattern("yyyy-MM-dd HH:mm:ss") }
     val outputFormat = LocalDateTime.Format { byUnicodePattern("yy/MM/dd HH:mm") }
 
@@ -103,25 +98,17 @@ fun List<*>.toMofLineMap(qualityType: WATER_QUALITY.QualityType):Map<String, Any
             }
         }
 
-    val entries = groupedByStation.keys.sorted()
-
-    return mapOf(
-        "entries" to entries,
-        "xValue" to xValues,
-        "values" to groupedByStation
-    )
-
+    return Triple(groupedByStation.keys.sorted(), xValues, groupedByStation)
 }
 
 
 @OptIn(FormatStringsInDatetimeFormats::class)
-fun List<*>.toLineMap(): Map<String, Any> {
+fun List<SeawaterInformationByObservationPoint>.toLineTriple(): Triple<List<String>, List<Double>, Map<String, List<Float>> >{
     val inputFormat = LocalDateTime.Format { byUnicodePattern("yyyy-MM-dd HH:mm:ss") }
     val outputFormat = LocalDateTime.Format { byUnicodePattern("yy/MM/dd HH:mm") }
 
     // 1. 기본 필터링 및 데이터 추출 (시간순 정렬 포함)
-    val rawData = this.filterIsInstance<SeawaterInformationByObservationPoint>()
-        .sortedBy { it.obs_datetime } // 이전 값을 참조하기 위해 시간순 정렬 필수
+    val rawData = this.sortedBy { it.obs_datetime } // 이전 값을 참조하기 위해 시간순 정렬 필수
 
     // 2. 관측소별로 그룹화하여 결측치 보정 (Forward Fill)
     val validData = rawData.groupBy { it.sta_nam_kor }
@@ -166,13 +153,8 @@ fun List<*>.toLineMap(): Map<String, Any> {
             }
         }
 
-    val entries = groupedByStation.keys.sorted()
 
-    return mapOf(
-        "entries" to entries,
-        "xValue" to xValues,
-        "values" to groupedByStation
-    )
+    return Triple(groupedByStation.keys.sorted(), xValues, groupedByStation)
 }
 
 fun Pair<List<String>, List<List<Any>>>.toMap():MutableMap<String, List<Any>>{
@@ -199,22 +181,39 @@ fun List<SeawaterInformationByObservationPoint>.toGridDataMap(): Map<String, Lis
     return (columns to rows).toMap()
 }
 
+fun List<SeawaterInformationByObservationPoint>.toBarChartTriple(): Triple<List<String>, List<String>, List<Float>>{
+    if (this.isEmpty()) return Triple(emptyList(), emptyList(), emptyList())
+    val columns = this.first().makeGridColumns()
+    val rows = this.map { it.toGridData() }
 
+    // 1. 필요한 컬럼의 인덱스를 찾습니다.
+    val obsIndex = columns.indexOf("Observatory")
+    val tempIndex = columns.indexOf("WaterTemperature")
+   // val timeIndex = columns.indexOf("Collection Time")
 
-fun List<SeawaterInformationByObservationPoint>.toBarChartMap(): Map<String, List<Any>> {
+    // 2. 인덱스가 유효한지 확인 후 데이터 추출
+    return if (obsIndex != -1 && tempIndex != -1 ) {
+        val entries =  rows.map { it[obsIndex].toString() }  // 관측소 목록
+        val values =  rows.map { it[tempIndex].toString().trim().toFloatOrNull() ?: 0f } // 수온 목록
 
+        Triple(
+            entries, entries, values
+        )
+    } else {
+        Triple(emptyList(), emptyList(), emptyList())
+    }
 
-    val gridData = this.toGridDataMap()
-    val entries = gridData["Observatory"] ?: emptyList()
-    val values = gridData["WaterTemperature"]?.map {  it.toString().trim().toFloatOrNull() ?: 0f } ?: emptyList()
-
-    return mapOf("entries" to entries, "xValue" to entries, "values" to values)
 }
 
 
 
 
-fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap():Map<String, List<Any>> {
+
+
+
+
+
+fun List<SeawaterInformationByObservationPoint>.toBoxPlotTriple():Triple<List<String>, List<String>, List<SeaWaterBoxPlotStat>> {
     val result =  this.map {
         Pair(
             it.sta_nam_kor,
@@ -224,7 +223,7 @@ fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap():Map<String, List<
         .mapValues { (key, values) ->
             val temps = values.map { it.second }.sorted() // 오름차순 정렬
             val n = temps.size
-            if (n == 0) return mapOf()
+            if (n == 0) return Triple(emptyList(), emptyList(), emptyList())
             // 사분위수 계산 (단순 인덱스 방식)
             val q1 = temps[n / 4] // 25% 지점인 1사분위수(Q1)
             val median = temps[n / 2] // 50% 지점인 중앙값(Q2)
@@ -257,7 +256,7 @@ fun List<SeawaterInformationByObservationPoint>.toBoxPlotMap():Map<String, List<
         val entries = result.keys.toList()
         val values = result.values.toList()
 
-        return mapOf("entries" to entries, "xValue" to entries, "values" to values)
+        return Triple(result.keys.toList(), result.keys.toList(), result.values.toList())
 
 }
 

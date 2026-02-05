@@ -27,9 +27,9 @@ import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.SizeConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
-import com.unchil.full_stack_task_manager_sample.chart.toBoxPlotMap
+import com.unchil.full_stack_task_manager_sample.chart.paddingMod
+import com.unchil.full_stack_task_manager_sample.chart.toBoxPlotTriple
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
-import io.github.koalaplot.core.xygraph.AxisModel
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
@@ -80,9 +80,9 @@ fun OceanWaterInfoBoxPlotChart(){
 
         if(isVisible){
 
-            val chartData = filteredList.toBoxPlotMap()
-            val currentEntries = chartData["entries"] as? List<String> ?: emptyList()
-            val currentValues = chartData["values"] as? List<SeaWaterBoxPlotStat> ?: emptyList()
+            val chartData = filteredList.toBoxPlotTriple()
+            val currentEntries = chartData.first
+            val currentValues = chartData.third
 
             // 상태 업데이트
             xValue.value = currentEntries

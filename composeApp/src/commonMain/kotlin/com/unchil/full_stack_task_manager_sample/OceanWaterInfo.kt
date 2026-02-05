@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unchil.full_stack_task_manager_sample.chart.paddingMod
 import com.unchil.full_stack_task_manager_sample.theme.AppTheme
 
 
-val padding = 8.dp
- val paddingMod = Modifier.padding(padding)
+
 
 @Composable
 fun OceanWaterInfo(){
