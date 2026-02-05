@@ -148,18 +148,18 @@ fun OceanWaterInfoLineChart_MOF(){
             val xRange = xValue.value.min()..xValue.value.max()
 
             chartLayout.value = LayoutData(
-                size = SizeConfig(chartHeight),
                 type = ChartType.Line,
                 layout = TitleConfig(true, "${chartTitle} (${selectedOption.name()})", description = selectedOption.desc()),
                 legend = LegendConfig(true, true, legendTitle),
                 xAxis = AxisConfig(
-                    model = DoubleLinearAxisModel(xRange) as AxisModel<Any>,
+                    model = DoubleLinearAxisModel(xRange) ,
                     style = AxisStyle(labelRotation = 0),
                 ),
                 yAxis = AxisConfig(
                     selectedOption.unit(),
-                    model = FloatLinearAxisModel(range) as AxisModel<Any>
+                    model = FloatLinearAxisModel(range)
                 ),
+                size = SizeConfig(chartHeight),
                 caption = CaptionConfig(true,chartCaption  ),
             )
 

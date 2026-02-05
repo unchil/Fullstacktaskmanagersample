@@ -4,7 +4,6 @@ package com.unchil.full_stack_task_manager_sample.chart
 import com.unchil.full_stack_task_manager_sample.SeaWaterBoxPlotStat
 import com.unchil.full_stack_task_manager_sample.SeaWaterInformation
 import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservationPoint
-import com.unchil.un7datagrid.toMap
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -45,7 +44,6 @@ fun List<*>.toMofLineMap(qualityType: WATER_QUALITY.QualityType):Map<String, Any
 
     // 1. 기본 필터링 및 데이터 추출 (시간순 정렬 포함)
     val rawData = this.filterIsInstance<SeaWaterInformation>()
-       // .filter { !listOf("SEA6001", "SEA1005").contains(it.rtmWqWtchStaCd) }
         .sortedBy { it.rtmWqWtchDtlDt } // 이전 값을 참조하기 위해 시간순 정렬 필수
 
 
@@ -177,8 +175,19 @@ fun List<*>.toLineMap(): Map<String, Any> {
     )
 }
 
+fun Pair<List<String>, List<List<Any>>>.toMap():MutableMap<String, List<Any>>{
+    val result = mutableMapOf<String, List<Any>>()
+    if(first.size == second.first().size) {
+        first.forEachIndexed { index, string ->
+            result.putAll(mapOf(string to second.map { it -> it[index] }.toList()) )
+        }
+    }
+    return result
+}
+
+
 // TypeTransform.kt 또는 적절한 위치에 추가
-fun List<SeawaterInformationByObservationPoint>.toGridDataMap(): Map<String, List<Any?>> {
+fun List<SeawaterInformationByObservationPoint>.toGridDataMap(): Map<String, List<Any>> {
     if (this.isEmpty()) return mutableMapOf()
 
     // 첫 번째 아이템에서 컬럼 이름을 추출
@@ -192,7 +201,7 @@ fun List<SeawaterInformationByObservationPoint>.toGridDataMap(): Map<String, Lis
 
 
 
-fun List<SeawaterInformationByObservationPoint>.toBarChartMap(): Map<String, List<Any?>> {
+fun List<SeawaterInformationByObservationPoint>.toBarChartMap(): Map<String, List<Any>> {
 
 
     val gridData = this.toGridDataMap()
@@ -299,9 +308,9 @@ fun SeawaterInformationByObservationPoint.makeGridColumns():List<String>{
     return columns
 }
 
-fun SeawaterInformationByObservationPoint.toGridData():List<Any?>{
+fun SeawaterInformationByObservationPoint.toGridData():List<Any>{
 
-    val data = mutableListOf<Any?>()
+    val data = mutableListOf<Any>()
     data.add(this.obs_datetime)
     data.add(this.gru_nam)
     data.add(this.sta_cde)

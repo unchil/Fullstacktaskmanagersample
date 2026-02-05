@@ -98,15 +98,15 @@ fun OceanWaterInfoLineChart(){
                 type = ChartType.Line,
                 layout = TitleConfig(true, chartTitle),
                 legend = LegendConfig(true, true, "Observatory"),
-                size = SizeConfig(height = chartHeight),
                 xAxis = AxisConfig(
-                    model = DoubleLinearAxisModel(xRange) as AxisModel<Any>,
+                    model = DoubleLinearAxisModel(xRange) ,
                     style = AxisStyle(labelRotation = 0)
                 ),
                 yAxis = AxisConfig(
                     chartYTitle,
-                    model = FloatLinearAxisModel(range) as AxisModel<Any>
+                    model = FloatLinearAxisModel(range)
                 ),
+                size = SizeConfig(height = chartHeight),
                 caption = CaptionConfig(true,chartCaption ),
             )
 

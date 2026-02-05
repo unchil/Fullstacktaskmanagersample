@@ -29,7 +29,6 @@ import com.unchil.full_stack_task_manager_sample.chart.SizeConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
 import com.unchil.full_stack_task_manager_sample.chart.toBarChartMap
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
-import io.github.koalaplot.core.xygraph.AxisModel
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.CategoryAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
@@ -97,12 +96,12 @@ fun OceanWaterInfoBarChart(){
                 legend = LegendConfig(true, true, chartXTitle),
                 xAxis = AxisConfig(
                     chartXTitle,
-                    model = CategoryAxisModel(xValue.value),
+                    model = CategoryAxisModel(currentEntries),
                     style = AxisStyle(labelRotation = 45)
                 ),
                 yAxis = AxisConfig(
                     chartYTitle,
-                    model = FloatLinearAxisModel(range) as AxisModel<Any>
+                    model = FloatLinearAxisModel(range)
                 ),
                 size = SizeConfig(height = chartHeight),
                 caption = CaptionConfig(true,  chartCaption  ),

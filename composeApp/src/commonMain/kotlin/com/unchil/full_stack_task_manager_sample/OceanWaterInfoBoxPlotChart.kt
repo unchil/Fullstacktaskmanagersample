@@ -101,14 +101,14 @@ fun OceanWaterInfoBoxPlotChart(){
                 legend = LegendConfig(true, true, chartXTitle),
                 xAxis = AxisConfig(
                     chartXTitle,
-                    model = CategoryAxisModel(xValue.value),
+                    model = CategoryAxisModel(currentEntries),
                     style = AxisStyle(labelRotation = 45)
                 ),
                 yAxis = AxisConfig(
                     chartYTitle,
-                    model = FloatLinearAxisModel(range) as AxisModel<Any>
+                    model = FloatLinearAxisModel(range)
                 ),
-                size = SizeConfig(height = 400.dp),
+                size = SizeConfig(height = chartHeight),
                 caption = CaptionConfig(true,chartCaption  ),
             )
 

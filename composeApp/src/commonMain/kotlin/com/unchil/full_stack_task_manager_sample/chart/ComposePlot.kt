@@ -116,7 +116,8 @@ fun ComposePlot(
         contentAlignment =  Alignment.Center
     ) {
         ChartLayout(
-            modifier = paddingMod.sizeIn(minHeight = layout.size.minHeight, maxHeight = layout.size.maxHeight)
+            modifier = paddingMod
+                .sizeIn(minHeight = layout.size.minHeight, maxHeight = layout.size.maxHeight)
                 .background(color = MaterialTheme.colorScheme.background),
             title = {
                 if (layout.layout.isTitle) {
@@ -130,7 +131,6 @@ fun ComposePlot(
             },
             legendLocation = layout.legend.location
         ) {
-
             Column {
 
                 if(!layout.layout.description.isNullOrBlank()){
@@ -253,20 +253,15 @@ fun ComposePlot(
 
 
             }
-
         } //-- ChartLayout
 
-
-
         if (layout.caption.isCaption) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
+            Box( modifier = Modifier.fillMaxSize(),
                 contentAlignment = layout.caption.location
             ) {
                 CaptionText(layout.caption.title, modifier = paddingMod)
             }
         } //-- Caption
-
 
     }
 }
@@ -377,7 +372,6 @@ fun XYGraphScope<String, Float>.BoxPlot(
     BoxPlotChart(data, xValues,usableTooltips, colors, BoxPlotRange.MAX)
     BoxPlotChart(data, xValues,usableTooltips, colors, BoxPlotRange.Q2)
     BoxPlotOutliers(data, xValues, usableTooltips, colors)
-
 }
 
 
