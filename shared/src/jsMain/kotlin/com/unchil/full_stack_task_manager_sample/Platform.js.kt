@@ -5,6 +5,9 @@ class JsPlatform: Platform {
 
     override val alias: PlatformAlias
         get() = PlatformAlias.JS
+
+    override val repository: OceanWaterRepository
+        get() = OceanWaterRepository()
 }
 
 actual fun getPlatform(): Platform = JsPlatform()

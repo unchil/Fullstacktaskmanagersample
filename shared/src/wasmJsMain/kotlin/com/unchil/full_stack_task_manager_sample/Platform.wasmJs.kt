@@ -5,6 +5,9 @@ class WasmPlatform: Platform {
 
     override val alias: PlatformAlias
         get() = PlatformAlias.WASM
+
+    override val repository: OceanWaterRepository
+        get() = OceanWaterRepository()
 }
 
 actual fun getPlatform(): Platform = WasmPlatform()

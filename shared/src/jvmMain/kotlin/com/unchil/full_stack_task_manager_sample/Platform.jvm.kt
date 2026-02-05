@@ -5,6 +5,9 @@ class JVMPlatform: Platform {
 
     override val alias: PlatformAlias
         get() = PlatformAlias.JVM
+
+    override val repository: OceanWaterRepository
+        get() = OceanWaterRepository()
 }
 
 actual fun getPlatform(): Platform = JVMPlatform()

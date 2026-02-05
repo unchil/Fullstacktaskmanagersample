@@ -7,6 +7,9 @@ class IOSPlatform: Platform {
 
     override val alias: PlatformAlias
         get() = PlatformAlias.IOS
+
+    override val repository: OceanWaterRepository
+        get() = OceanWaterRepository()
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()
