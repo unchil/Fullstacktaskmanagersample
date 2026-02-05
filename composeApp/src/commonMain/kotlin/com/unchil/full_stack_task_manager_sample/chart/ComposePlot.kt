@@ -568,11 +568,12 @@ fun XYGraphScope<Double, Float>.LineChart(
                 brush = SolidColor(colors[key] ?: Color.Black),
                 strokeWidth = 1.dp),
             symbol = { point ->
+                /*
                 TooltipBox(
                     positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
                         TooltipAnchorPosition.Above),
                     tooltip = {
-                        if (usableTooltips) {
+                        if (false) {
                             PlainTooltip { Text("${key}\n${formatLongToDateTime(point.x)}\n${ kotlin.math.round(point.y * 10) / 10.0}") }
                         }
                     },
@@ -584,6 +585,8 @@ fun XYGraphScope<Double, Float>.LineChart(
                         size = 6.dp,
                     )
                 }
+
+                 */
             },
         )
     }
@@ -636,13 +639,19 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                         ),
                         contentAlignment = Alignment.Center
                     ) {
+
                         Column{
+                            // 1. 현재 x축 인덱스(index)에 해당하는 모든 관측소의 데이터를 가져옵니다.
+                            // 결과: List<Pair<String, Float>> -> [("관측소A", 12.5), ("관측소B", 15.1)]
+                            val sortedEntries = data.map { entry ->
+                                entry.key to entry.value[index]
+                            }.sortedByDescending { it.second } // 2. 값을 기준으로 내림차순 정렬 (큰 값이 위로)
+                            // 3. 차트 제목(시간)을 먼저 표시합니다.
                             BoxPlotTooltips(formatLongToDateTime(values[index].x), Color.LightGray)
-
-                            data.keys.forEachIndexed { keyIndex, observatory ->
-
+                            // 4. 정렬된 리스트를 순회하며 툴팁을 그립니다.
+                            sortedEntries.forEach {  (observatory, value) ->
                                 BoxPlotTooltips(
-                                    "${observatory} ${data.values.toList()[keyIndex][index]}",
+                                    "${observatory} ${value}",
                                     colors[observatory]
                                 )
                             }
