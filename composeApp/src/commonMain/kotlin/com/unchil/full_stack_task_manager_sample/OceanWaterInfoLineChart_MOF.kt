@@ -143,6 +143,7 @@ fun OceanWaterInfoLineChart_MOF(viewModel: MofSeaWaterInfoViewModel){
                 ),
                 yAxis = AxisConfig(
                     selectedOption.unit(),
+                    range = range,
                     model = FloatLinearAxisModel(range)
                 ),
                 size = SizeConfig(chartHeight),

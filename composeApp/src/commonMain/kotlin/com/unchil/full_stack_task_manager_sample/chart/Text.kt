@@ -88,6 +88,7 @@ fun AxisLabel(
 @Composable
 fun BoxPlotTooltips(
     text: String,
+    color:Color? = null
 ) {
     Text(
         text,
@@ -96,8 +97,8 @@ fun BoxPlotTooltips(
         modifier = Modifier
             .padding(vertical = 1.dp)
             .fillMaxWidth()
-            .background( color = Color.Black, shape = ShapeDefaults.Small),
-        color = Color.LightGray)
+            .background( color = color ?: Color.White, shape = ShapeDefaults.Small),
+        color = Color.Black)
 
 }
 

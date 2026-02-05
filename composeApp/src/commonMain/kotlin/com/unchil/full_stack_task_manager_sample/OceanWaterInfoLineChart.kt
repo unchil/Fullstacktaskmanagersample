@@ -92,6 +92,7 @@ fun OceanWaterInfoLineChart(viewModel: NifsSeaWaterInfoViewModel){
                 ),
                 yAxis = AxisConfig(
                     chartYTitle,
+                    range = range,
                     model = FloatLinearAxisModel(range)
                 ),
                 size = SizeConfig(height = chartHeight),

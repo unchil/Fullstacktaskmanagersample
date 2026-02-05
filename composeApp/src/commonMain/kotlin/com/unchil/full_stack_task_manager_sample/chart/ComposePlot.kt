@@ -198,7 +198,7 @@ fun ComposePlot(
                     when (layout.type) {
                         ChartType.Line -> {
                             val scope = this as XYGraphScope<Double, Float>
-                            scope.LineChart(data, xValues, layout.tooltips.isTooltips, colors)
+                            scope.LineChart(data, xValues, layout.tooltips.isTooltips, colors, layout.yAxis.range)
                         }
 
                         ChartType.VerticalBar -> {
@@ -545,10 +545,11 @@ fun XYGraphScope<String, Float>.BoxPlotOutliers(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalKoalaPlotApi::class)
 @Composable
 fun XYGraphScope<Double, Float>.LineChart(
-    data:Any,
-    xValues:Any,
+    data: Any,
+    xValues: Any,
     usableTooltips: Boolean,
-    colors: Map<String, Color>
+    colors: Map<String, Color>,
+    range: ClosedFloatingPointRange<Float>
 ) {
 
     val data = (data as Map<String, List<Float>>)
@@ -586,8 +587,77 @@ fun XYGraphScope<Double, Float>.LineChart(
             },
         )
     }
+
+
+    VerticalBarChart(
+        data,
+        xValues,
+        usableTooltips,
+        colors,
+        range
+    )
+
+
 }
 
+@Composable
+fun XYGraphScope<Double, Float>.VerticalBarChart(
+    data: Map<String, List<Float>>,
+    xValues: List<Double>,
+    usableTooltips: Boolean,
+    colors: Map<String, Color>,
+    range: ClosedFloatingPointRange<Float>
+){
+
+    val values: List<VerticalBarPlotEntry<Double, Float>> = buildList {
+        data.values.first().forEachIndexed { index, fl ->
+            add(
+                DefaultVerticalBarPlotEntry(
+                    xValues[index],
+                    DefaultBarPosition(0f, range.endInclusive)
+                )
+            )
+        }
+    }
+
+    VerticalBarPlot(
+        values,
+        bar = { index, _, _ ->
+            DefaultBar(
+                brush = SolidColor( Color.Transparent),
+                modifier = Modifier.fillMaxWidth(),
+            ){
+                if (usableTooltips) {
+
+                    Box(
+                        modifier = Modifier.width(100.dp).background(
+                            color = Color.Transparent,
+                            shape = ShapeDefaults.Medium
+                        ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column{
+                            BoxPlotTooltips(formatLongToDateTime(values[index].x), Color.LightGray)
+
+                            data.keys.forEachIndexed { keyIndex, observatory ->
+
+                                BoxPlotTooltips(
+                                    "${observatory} ${data.values.toList()[keyIndex][index]}",
+                                    colors[observatory]
+                                )
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        },
+        barWidth = 1f
+
+    )
+
+}
 
 
 
