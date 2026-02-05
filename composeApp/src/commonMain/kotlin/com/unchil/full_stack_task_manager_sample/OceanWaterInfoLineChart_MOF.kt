@@ -41,22 +41,8 @@ import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun OceanWaterInfoLineChart_MOF(){
+fun OceanWaterInfoLineChart_MOF(viewModel: MofSeaWaterInfoViewModel){
 
-    val coroutineScope = rememberCoroutineScope()
-
-    val viewModel: MofSeaWaterInfoViewModel = remember {
-        MofSeaWaterInfoViewModel( coroutineScope )
-    }
-
-    LaunchedEffect(key1 = viewModel){
-        viewModel.onEvent(MofSeaWaterInfoViewModel.Event.Refresh)
-        while(true){
-            delay(10 * 60 * 1000L).let{
-                viewModel.onEvent(MofSeaWaterInfoViewModel.Event.Refresh)
-            }
-        }
-    }
 
     var isVisible by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(WATER_QUALITY.QualityType.entries[0]) }

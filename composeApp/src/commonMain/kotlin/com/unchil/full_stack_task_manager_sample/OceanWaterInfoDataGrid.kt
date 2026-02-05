@@ -46,24 +46,11 @@ val LocalPlatform = compositionLocalOf<Platform> { error("No Platform found!") }
 
 
 @Composable
-fun OceanWaterInfoDataGrid(){
+fun OceanWaterInfoDataGrid(viewModel: NifsSeaWaterInfoCurrentViewModel){
 
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var isVisible by remember { mutableStateOf(false) }
-
-    val viewModel: NifsSeaWaterInfoCurrentViewModel = remember {
-        NifsSeaWaterInfoCurrentViewModel(  coroutineScope  )
-    }
-
-    LaunchedEffect(key1 = viewModel){
-        viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
-        while(true){
-            delay(10 * 60 * 1000L).let{
-                viewModel.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
-            }
-        }
-    }
 
     val reloadData :()->Unit = {
         coroutineScope.launch{

@@ -5,6 +5,7 @@ import com.unchil.full_stack_task_manager_sample.OceanWaterRepository
 import com.unchil.full_stack_task_manager_sample.SeaWaterInformation
 import com.unchil.full_stack_task_manager_sample.getPlatform
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -18,15 +19,16 @@ class MofSeaWaterInfoViewModel( scope:  CoroutineScope){
 
     init {
         scope.launch {
+            getSeaWaterInfo()
             repository._seaWaterInfoOneDayMofStateFlow.collectLatest {
                 _seaWaterInfo.value = it
             }
         }
     }
 
-    suspend fun onEvent(event: MofSeaWaterInfoViewModel.Event) {
+    suspend fun onEvent(event: Event) {
         when (event) {
-            is MofSeaWaterInfoViewModel.Event.Refresh -> {
+            is Event.Refresh -> {
                 getSeaWaterInfo()
             }
         }

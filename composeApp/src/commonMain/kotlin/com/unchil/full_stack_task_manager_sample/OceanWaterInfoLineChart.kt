@@ -38,22 +38,9 @@ import kotlinx.coroutines.delay
 
 
 @Composable
-fun OceanWaterInfoLineChart(){
+fun OceanWaterInfoLineChart(viewModel: NifsSeaWaterInfoViewModel){
 
-    val coroutineScope = rememberCoroutineScope()
 
-    val viewModel: NifsSeaWaterInfoViewModel = remember {
-        NifsSeaWaterInfoViewModel( coroutineScope )
-    }
-
-    LaunchedEffect(key1 = viewModel){
-        viewModel.onEvent(NifsSeaWaterInfoViewModel.Event.Refresh)
-        while(true){
-            delay(10 * 60 * 1000L).let{
-                viewModel.onEvent(NifsSeaWaterInfoViewModel.Event.Refresh)
-            }
-        }
-    }
 
     var isVisible by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(SEA_AREA.GRU_NAME.entries[0]) }

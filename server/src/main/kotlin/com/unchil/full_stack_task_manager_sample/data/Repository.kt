@@ -53,7 +53,7 @@ private val cacheStorage_SeawaterInfo_Mof = ConcurrentHashMap<String, Pair<List<
 private val cacheStorage_SeaWaterInfoStatistics = ConcurrentHashMap<String, Pair<List<SeaWaterInfoByOneHourStat>, Long>>()
 
 private val cacheStorage_SeaWaterInfoBoxPlot = ConcurrentHashMap<String, Pair<List<SeaWaterBoxPlotStat>, Long>>()
-private const val CACHE_EXPIRY_SECONDS =  1 * 60L  // 10분
+private const val CACHE_EXPIRY_SECONDS =  5 * 60L
 
 
 

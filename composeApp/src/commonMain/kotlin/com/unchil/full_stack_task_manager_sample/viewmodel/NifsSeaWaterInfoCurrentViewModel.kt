@@ -5,6 +5,7 @@ import com.unchil.full_stack_task_manager_sample.OceanWaterRepository
 import com.unchil.full_stack_task_manager_sample.SeawaterInformationByObservationPoint
 import com.unchil.full_stack_task_manager_sample.getPlatform
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -18,17 +19,17 @@ class NifsSeaWaterInfoCurrentViewModel ( scope:  CoroutineScope){
             = MutableStateFlow(emptyList())
 
     init {
-
         scope.launch {
+            getSeaWaterInfoCurrent()
             repository._seaWaterInfoCurrentStateFlow.collectLatest {
                _seaWaterInfo.value = it
             }
         }
     }
 
-    suspend fun onEvent(event: NifsSeaWaterInfoCurrentViewModel.Event) {
+    suspend fun onEvent(event: Event) {
         when (event) {
-            is NifsSeaWaterInfoCurrentViewModel.Event.Refresh -> {
+            is Event.Refresh -> {
                 getSeaWaterInfoCurrent()
 
             }

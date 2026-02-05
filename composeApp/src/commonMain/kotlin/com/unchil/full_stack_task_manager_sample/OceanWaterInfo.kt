@@ -12,6 +12,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -19,12 +22,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unchil.full_stack_task_manager_sample.chart.paddingMod
 import com.unchil.full_stack_task_manager_sample.theme.AppTheme
-
-
+import com.unchil.full_stack_task_manager_sample.viewmodel.MofSeaWaterInfoViewModel
+import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
+import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
+import kotlinx.coroutines.delay
 
 
 @Composable
 fun OceanWaterInfo(){
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val viewModelCurrent: NifsSeaWaterInfoCurrentViewModel = remember {
+        NifsSeaWaterInfoCurrentViewModel(  coroutineScope  )
+    }
+
+    val viewModelOneDay: NifsSeaWaterInfoViewModel = remember {
+        NifsSeaWaterInfoViewModel( coroutineScope )
+    }
+
+    val viewModelMofOneDay: MofSeaWaterInfoViewModel = remember {
+        MofSeaWaterInfoViewModel( coroutineScope )
+    }
+
+
+    LaunchedEffect(key1 = viewModelCurrent, key2 = viewModelOneDay, key3 = viewModelMofOneDay){
+        while(true){
+            delay(1 * 60 * 1000L).let{
+                viewModelCurrent.onEvent(NifsSeaWaterInfoCurrentViewModel.Event.Refresh)
+                viewModelOneDay.onEvent(NifsSeaWaterInfoViewModel.Event.Refresh)
+                viewModelMofOneDay.onEvent(MofSeaWaterInfoViewModel.Event.Refresh)
+            }
+        }
+    }
+
 
     AppTheme(enableDarkMode=false) {
 
@@ -50,15 +81,15 @@ fun OceanWaterInfo(){
                     fontWeight = FontWeight.Bold,
                 )
 
-                OceanWaterInfoDataGrid()
+                OceanWaterInfoDataGrid(viewModel = viewModelCurrent)
                 HorizontalDivider(modifier = Modifier.padding(10.dp))
-                OceanWaterInfoBarChart()
+                OceanWaterInfoBarChart(viewModel = viewModelCurrent)
                 HorizontalDivider(modifier = Modifier.padding(10.dp))
-                OceanWaterInfoBoxPlotChart()
+                OceanWaterInfoBoxPlotChart(viewModelOneDay)
                 HorizontalDivider(modifier = Modifier.padding(10.dp))
-                OceanWaterInfoLineChart()
+                OceanWaterInfoLineChart(viewModelOneDay)
                 HorizontalDivider(modifier = Modifier.padding(10.dp))
-                OceanWaterInfoLineChart_MOF()
+                OceanWaterInfoLineChart_MOF(viewModelMofOneDay)
 
 
 
