@@ -94,9 +94,9 @@ fun BoxPlotTooltips(
     Text(
         text,
         textAlign= TextAlign.Center,
-        style = TextStyle(fontSize=TextUnit(14f, TextUnitType.Sp)),
+        style = TextStyle(fontSize=TextUnit(12f, TextUnitType.Sp)),
         modifier = modifier,
-        color = Color.White)
+        color = Color.LightGray)
 
 }
 
