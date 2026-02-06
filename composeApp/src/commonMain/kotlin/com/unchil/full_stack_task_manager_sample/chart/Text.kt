@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
@@ -88,16 +89,13 @@ fun AxisLabel(
 @Composable
 fun BoxPlotTooltips(
     text: String,
-    color:Color? = null
+    modifier:Modifier = Modifier.width(100.dp)
 ) {
     Text(
         text,
         textAlign= TextAlign.Center,
         style = TextStyle(fontSize=TextUnit(14f, TextUnitType.Sp)),
-        modifier = Modifier
-            .padding(vertical = 1.dp)
-            .fillMaxWidth()
-            .background( color = color ?: Color.Gray, shape = ShapeDefaults.Small),
+        modifier = modifier,
         color = Color.White)
 
 }

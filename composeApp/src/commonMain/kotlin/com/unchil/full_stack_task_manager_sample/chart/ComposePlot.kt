@@ -3,6 +3,7 @@ package com.unchil.full_stack_task_manager_sample.chart
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,13 +12,16 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DividerDefaults.color
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -30,15 +34,22 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import androidx.compose.ui.zIndex
 import com.unchil.full_stack_task_manager_sample.SeaWaterBoxPlotStat
 import io.github.koalaplot.core.ChartLayout
 import io.github.koalaplot.core.Symbol
@@ -473,12 +484,18 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
                         contentAlignment = Alignment.Center
                     ) {
                         Column{
-                            BoxPlotTooltips(values[i].x)
-                            BoxPlotTooltips("max:${data[i].max}")
-                            BoxPlotTooltips("75%:${data[i].q3}")
-                            BoxPlotTooltips("50%:${data[i].median}")
-                            BoxPlotTooltips("25%:${data[i].q1}")
-                            BoxPlotTooltips("min:${data[i].min}")
+
+                            val modifier = Modifier.width(100.dp).padding(vertical = 1.dp)
+                                .background( color =  Color.DarkGray.copy(0.5f), shape = ShapeDefaults.Small)
+
+                            BoxPlotTooltips(values[i].x, modifier)
+                            BoxPlotTooltips("max:${data[i].max}", modifier)
+                            BoxPlotTooltips("75%:${data[i].q3}", modifier)
+                            BoxPlotTooltips("50%:${data[i].median}", modifier)
+                            BoxPlotTooltips("25%:${data[i].q1}", modifier)
+                            BoxPlotTooltips("min:${data[i].min}", modifier)
+
+
 
                         }
 
@@ -612,6 +629,11 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
     range: ClosedFloatingPointRange<Float>
 ){
 
+    val defaultBarWidth = remember { 120.dp }
+    val isHoverState = remember{ mutableStateOf(false) }
+    val hoverLine: MutableState<Double > = remember { mutableStateOf(0.0) }
+    val currentIndex = remember { mutableStateOf(0)}
+
     val values: List<VerticalBarPlotEntry<Double, Float>> = buildList {
         data.values.first().forEachIndexed { index, fl ->
             add(
@@ -623,20 +645,60 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
         }
     }
 
+    val onHoverHandler = { x:Double, index:Int ->
+        hoverLine.value = x
+        currentIndex.value = index
+        isHoverState.value = true
+    }
+
+    // 마우스가 막대를 벗어났을 때 호출할 핸들러
+    val onExitHandler = {
+        isHoverState.value = false
+    }
+
+
     VerticalBarPlot(
         values,
         bar = { index, _, _ ->
+
             DefaultBar(
+         //       brush = SolidColor( if (isHoverState.value && hoverLine.value == values[index].x) Color.Gray else Color.Transparent),
                 brush = SolidColor( Color.Transparent),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+               //     .zIndex(if (isHoverState.value && hoverLine.value == values[index].x) 1f else 0f)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                when (event.type) {
+                                    // 1. 마우스가 영역에 들어왔을 때 (Hover 시작)
+                                    PointerEventType.Enter -> {
+                                        onHoverHandler(values[index].x, index)
+                                    }
+                                    // 2. 마우스가 영역을 벗어났을 때 (Hover 종료)
+                                    PointerEventType.Exit -> {
+                                        onExitHandler()
+                                    }
+                                }
+                            }
+                        }
+                    },
             ){
                 if (usableTooltips) {
+                    // xOffset이 양수면 우측, 음수면 좌측으로 이동
+                    val xOffset = if (index > values.size / 2) (-defaultBarWidth/2)-10.dp else defaultBarWidth/2+10.dp
 
                     Box(
-                        modifier = Modifier.width(100.dp).background(
-                            color = Color.Transparent,
-                            shape = ShapeDefaults.Medium
-                        ),
+                        modifier = Modifier
+                       //     .border(1.dp, color=Color.Black)
+                            .offset(x = xOffset, y = 0.dp)
+                            .width(defaultBarWidth) // 툴팁 너비 유지
+                            .wrapContentSize(unbounded = true)
+                            .background(
+                                color = Color.Transparent,
+                                shape = ShapeDefaults.Medium
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
 
@@ -644,27 +706,60 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                             // 1. 현재 x축 인덱스(index)에 해당하는 모든 관측소의 데이터를 가져옵니다.
                             // 결과: List<Pair<String, Float>> -> [("관측소A", 12.5), ("관측소B", 15.1)]
                             val sortedEntries = data.map { entry ->
-                                entry.key to entry.value[index]
+                                entry.key to (entry.value.getOrNull(index) ?: 0f)
                             }.sortedByDescending { it.second } // 2. 값을 기준으로 내림차순 정렬 (큰 값이 위로)
                             // 3. 차트 제목(시간)을 먼저 표시합니다.
-                            BoxPlotTooltips(formatLongToDateTime(values[index].x), Color.Gray)
+                            BoxPlotTooltips(
+                                formatLongToDateTime(values[index].x),
+                                Modifier.width(defaultBarWidth).padding(vertical = 1.dp)
+                                .background( color = Color.Gray, shape = ShapeDefaults.Small)
+                            )
                             // 4. 정렬된 리스트를 순회하며 툴팁을 그립니다.
                             sortedEntries.forEach {  (observatory, value) ->
                                 BoxPlotTooltips(
                                     "${observatory} ${value}",
-                                    colors[observatory]
+                                    Modifier.width(defaultBarWidth).padding(vertical = 1.dp)
+                                    .background( color = colors[observatory] as Color, shape = ShapeDefaults.Small)
                                 )
                             }
-
                         }
 
                     }
                 }
+
+
             }
         },
-        barWidth = 1f
+        barWidth =  0.9f
 
     )
+
+
+    if(isHoverState.value){
+
+        val hoverVerticalLine: List<VerticalBarPlotEntry<Double, Float>> = listOf(
+            DefaultVerticalBarPlotEntry(
+                hoverLine.value,
+                DefaultBarPosition(0f, range.endInclusive)
+            )
+        )
+        VerticalBarPlot(
+            data = hoverVerticalLine,
+            bar = { _, _, _ ->
+                DefaultBar(
+                    brush = SolidColor( Color.Gray),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .zIndex(1f )
+                ){}
+            },
+            barWidth = 0.01f
+        )
+    }
+
+
+
+
 
 }
 
