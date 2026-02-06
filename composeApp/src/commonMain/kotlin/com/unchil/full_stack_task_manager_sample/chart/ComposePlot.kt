@@ -647,7 +647,7 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                                 entry.key to entry.value[index]
                             }.sortedByDescending { it.second } // 2. 값을 기준으로 내림차순 정렬 (큰 값이 위로)
                             // 3. 차트 제목(시간)을 먼저 표시합니다.
-                            BoxPlotTooltips(formatLongToDateTime(values[index].x), Color.LightGray)
+                            BoxPlotTooltips(formatLongToDateTime(values[index].x), Color.Gray)
                             // 4. 정렬된 리스트를 순회하며 툴팁을 그립니다.
                             sortedEntries.forEach {  (observatory, value) ->
                                 BoxPlotTooltips(

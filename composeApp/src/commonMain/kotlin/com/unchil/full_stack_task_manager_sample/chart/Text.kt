@@ -98,7 +98,7 @@ fun BoxPlotTooltips(
             .padding(vertical = 1.dp)
             .fillMaxWidth()
             .background( color = color ?: Color.Gray, shape = ShapeDefaults.Small),
-        color = Color.Black)
+        color = Color.White)
 
 }
 
