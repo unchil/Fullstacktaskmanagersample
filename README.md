@@ -53,6 +53,72 @@ This project leverages several powerful libraries to handle data and UI:
 | ![ScreenShot](https://github.com/unchil/Fullstacktaskmanagersample/raw/main/screenshot/screenshot_new.png) | 
 |    ![ScreenShot](https://github.com/unchil/Fullstacktaskmanagersample/raw/main/screenshot/full_new.gif)    | 
 
+
+## API Authentication & Setup
+
+this project collects real-time oceanographic data from two main sources. To run the collectionServer, you must obtain your own API keys and configure them in application.json.
+
+1. NIFS (National Institute of Fisheries Science)
+
+    • Purpose: Fetching the list of observation points and their specific codes.
+
+    • Endpoints:
+
+        ◦ Observation Point List  : https://www.nifs.go.kr/OpenAPI_json/risaList
+        ◦ Observation Point Codes : https://www.nifs.go.kr/OpenAPI_json/risaCode
+
+    • How to get a key:
+
+         i. Visit the NIFS Open API Portal.
+        ii. Register for an account and request an API Key for "Real-time Oceanographic Observation Data".
+       iii. Update the NIFS_API.apikey field in application.json.
+
+2. Public Data Portal - MOF (Ministry of Oceans and Fisheries)
+
+    • Purpose: Fetching real-time seawater information (Temperature, Salinity, etc.) via the "OceansWemoObvpRtmInfo" service.
+    
+    • Endpoint: 
+
+        ◦ OceansWemoObvpRtmInfoService : https://apis.data.go.kr/1192000/OceansWemoObvpRtmInfoService/OceansWemoObvpRtmInfo
+   
+    • How to get a key:
+
+          i. Go to the Public Data Portal (data.go.kr).
+         ii. Search for "OceansWemoObvpRtmInfoService" (해양수산부 국립해양조사원_실시간 조석관측정보 조회 서비스).
+        iii. Click "Apply for Use" (활용신청) and get your Encoding/Decoding Service Key.
+         iv. Update the MOF_API.apikey field in application.json.
+
+## Configuration File (application.json)
+
+Configure your keys in collectionServer/src/main/resources/application.json as follows:
+
+```JSON
+{
+    "NIFS_API": {
+        "endPoint": "https://www.nifs.go.kr",
+        "apikey": "YOUR_NIFS_API_KEY",
+        "subPath": "OpenAPI_json"
+    },
+    "MOF_API": {
+        "endPoint": "https://apis.data.go.kr",
+        "apikey": "YOUR_MOF_DECODING_KEY",
+        "subPath": "1192000/OceansWemoObvpRtmInfoService/OceansWemoObvpRtmInfo"
+    },
+    "SQLITE_DB": {
+        "jdbcURL": "jdbc:sqlite:/path/to/your/database.sqlite"
+    }
+}
+
+```
+⚠️ Important:
+
+• For MOF_API, if you encounter a "SERVICE_KEY_IS_NOT_REGISTERED_ERROR", try using the Decoded Key instead of the Encoded one, or vice-versa, depending on your HTTP client's encoding settings.
+
+• To avoid pushing the actual key in application.json to GitHub, we recommend adding it to .gitignore or sharing only the sample file (application.json.example).
+
+• Currently, the SQLITE_DB path in application.json is an absolute path (/Users/unchil/...). We recommend changing it to a relative path (jdbc:sqlite:./database.sqlite) relative to the project root.
+
+
 ## Setup & Installation
 1. GitHub Packages Configuration
    This project uses ComposeDataGrid, which is hosted on GitHub Packages. You must configure your local.properties or environment variables to authenticate.
