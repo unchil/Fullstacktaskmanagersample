@@ -79,6 +79,7 @@ import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import io.github.koalaplot.core.xygraph.XYGraph
 import io.github.koalaplot.core.xygraph.XYGraphScope
 import io.github.koalaplot.core.xygraph.rememberAxisStyle
+import io.github.koalaplot.core.xygraph.rememberGridStyle
 
 
 @OptIn(ExperimentalKoalaPlotApi::class)
@@ -205,6 +206,7 @@ fun ComposePlot(
                             labelRotation = layout.yAxis.style?.labelRotation ?: 0,
                         )
                     ),
+                    gridStyle  = rememberGridStyle(  ),
                 ) {
                     when (layout.type) {
                         ChartType.Line -> {
@@ -585,7 +587,8 @@ fun XYGraphScope<Double, Float>.LineChart(
                 brush = SolidColor(colors[key] ?: Color.Black),
                 strokeWidth = 1.dp),
             symbol = { point ->
-/*
+
+                /*
                 TooltipBox(
                     positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
                         TooltipAnchorPosition.Above),
@@ -599,13 +602,10 @@ fun XYGraphScope<Double, Float>.LineChart(
                     Symbol(
                         shape = ShapeDefaults.ExtraSmall,
                         fillBrush = SolidColor(colors[key] ?: Color.Black),
-                        size = 6.dp,
+                        size = 1.dp,
                     )
                 }
-
- */
-
-
+                 */
             },
         )
     }
@@ -647,6 +647,11 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
         }
     }
 
+    val barWidth = when(xValues.size){
+        in 0..60 -> 0.2f
+        else -> 0.9f
+    }
+
     val onHoverHandler = { x:Double, index:Int ->
         hoverLine.value = x
         currentIndex.value = index
@@ -663,11 +668,11 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
         bar = { index, _, _ ->
 
             DefaultBar(
-         //       brush = SolidColor( if (isHoverState.value && hoverLine.value == values[index].x) Color.Gray else Color.Transparent),
-                brush = SolidColor( Color.Transparent),
+                brush = SolidColor( if (isHoverState.value && hoverLine.value == values[index].x) Color.Blue.copy(0.5f) else Color.Transparent),
+        //        brush = SolidColor( Color.Transparent),
                 modifier = Modifier
                     .fillMaxWidth()
- //                   .zIndex(if (isHoverState.value && hoverLine.value == values[index].x) 1f else 0f)
+                    .zIndex(if (isHoverState.value && hoverLine.value == values[index].x) 1f else 0f)
                     .pointerInput(Unit) {
                         awaitPointerEventScope {
                             while (true) {
@@ -690,7 +695,7 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                     val  horizontalAlignment: Alignment.Horizontal = if (index > values.size / 2) Alignment.Start else Alignment.End
                     Box(
                         modifier = Modifier
-                          //  .border(1.dp, color=Color.Black)
+                      //      .border(1.dp, color=Color.Black)
                             .wrapContentSize(unbounded = true)
                             .background(
                                 color = Color.Transparent,
@@ -701,8 +706,8 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
 
                         Column(
                             modifier = Modifier
-                              //  .border(1.dp, color=Color.Black)
-                                .width(defaultBarWidth + defaultBarWidth + 20.dp),
+                         //       .border(1.dp, color=Color.Black)
+                                .width(defaultBarWidth + defaultBarWidth + 30.dp),
                             horizontalAlignment = horizontalAlignment,
                         ){
                             // 1. 현재 x축 인덱스(index)에 해당하는 모든 관측소의 데이터를 가져옵니다.
@@ -731,11 +736,11 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
 
             }
         },
-        barWidth = 0.9f
+        barWidth = barWidth
 
     )
 
-
+/*
     if(isHoverState.value){
 
         val hoverVerticalLine: List<VerticalBarPlotEntry<Double, Float>> = listOf(
@@ -758,7 +763,7 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
         )
     }
 
-
+*/
 
 
 

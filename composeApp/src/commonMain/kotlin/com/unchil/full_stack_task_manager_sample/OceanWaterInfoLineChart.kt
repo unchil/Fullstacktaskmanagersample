@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.unchil.full_stack_task_manager_sample.SEA_AREA.gru_nam
 import com.unchil.full_stack_task_manager_sample.chart.AxisConfig
@@ -30,10 +31,12 @@ import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
 import com.unchil.full_stack_task_manager_sample.chart.paddingMod
 import com.unchil.full_stack_task_manager_sample.chart.toLineTriple
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
+import io.github.koalaplot.core.style.KoalaPlotTheme
 import io.github.koalaplot.core.xygraph.AxisModel
 import io.github.koalaplot.core.xygraph.AxisStyle
 import io.github.koalaplot.core.xygraph.DoubleLinearAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
+import io.github.koalaplot.core.xygraph.TickPosition
 import kotlinx.coroutines.delay
 
 
@@ -88,7 +91,6 @@ fun OceanWaterInfoLineChart(viewModel: NifsSeaWaterInfoViewModel){
                 legend = LegendConfig(true, true, "Observatory"),
                 xAxis = AxisConfig(
                     model = DoubleLinearAxisModel(xRange) ,
-                    style = AxisStyle(labelRotation = 0)
                 ),
                 yAxis = AxisConfig(
                     chartYTitle,
