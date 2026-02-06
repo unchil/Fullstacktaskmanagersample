@@ -585,7 +585,7 @@ fun XYGraphScope<Double, Float>.LineChart(
                 brush = SolidColor(colors[key] ?: Color.Black),
                 strokeWidth = 1.dp),
             symbol = { point ->
-                /*
+/*
                 TooltipBox(
                     positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
                         TooltipAnchorPosition.Above),
@@ -603,7 +603,9 @@ fun XYGraphScope<Double, Float>.LineChart(
                     )
                 }
 
-                 */
+ */
+
+
             },
         )
     }
@@ -656,7 +658,6 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
         isHoverState.value = false
     }
 
-
     VerticalBarPlot(
         values,
         bar = { index, _, _ ->
@@ -666,7 +667,7 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                 brush = SolidColor( Color.Transparent),
                 modifier = Modifier
                     .fillMaxWidth()
-               //     .zIndex(if (isHoverState.value && hoverLine.value == values[index].x) 1f else 0f)
+ //                   .zIndex(if (isHoverState.value && hoverLine.value == values[index].x) 1f else 0f)
                     .pointerInput(Unit) {
                         awaitPointerEventScope {
                             while (true) {
@@ -686,14 +687,10 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                     },
             ){
                 if (usableTooltips) {
-                    // xOffset이 양수면 우측, 음수면 좌측으로 이동
-                    val xOffset = if (index > values.size / 2) (-defaultBarWidth/2)-10.dp else defaultBarWidth/2+10.dp
-
+                    val  horizontalAlignment: Alignment.Horizontal = if (index > values.size / 2) Alignment.Start else Alignment.End
                     Box(
                         modifier = Modifier
-                       //     .border(1.dp, color=Color.Black)
-                            .offset(x = xOffset, y = 0.dp)
-                            .width(defaultBarWidth) // 툴팁 너비 유지
+                          //  .border(1.dp, color=Color.Black)
                             .wrapContentSize(unbounded = true)
                             .background(
                                 color = Color.Transparent,
@@ -702,7 +699,12 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                         contentAlignment = Alignment.Center
                     ) {
 
-                        Column{
+                        Column(
+                            modifier = Modifier
+                              //  .border(1.dp, color=Color.Black)
+                                .width(defaultBarWidth + defaultBarWidth + 20.dp),
+                            horizontalAlignment = horizontalAlignment,
+                        ){
                             // 1. 현재 x축 인덱스(index)에 해당하는 모든 관측소의 데이터를 가져옵니다.
                             // 결과: List<Pair<String, Float>> -> [("관측소A", 12.5), ("관측소B", 15.1)]
                             val sortedEntries = data.map { entry ->
@@ -727,10 +729,9 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                     }
                 }
 
-
             }
         },
-        barWidth =  0.9f
+        barWidth = 0.9f
 
     )
 
@@ -747,7 +748,7 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
             data = hoverVerticalLine,
             bar = { _, _, _ ->
                 DefaultBar(
-                    brush = SolidColor( Color.Gray),
+                    brush = SolidColor( Color.Blue),
                     modifier = Modifier
                         .fillMaxWidth()
                         .zIndex(1f )
