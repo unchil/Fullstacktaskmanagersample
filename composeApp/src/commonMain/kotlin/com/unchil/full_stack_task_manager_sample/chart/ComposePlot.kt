@@ -211,7 +211,7 @@ fun ComposePlot(
                     when (layout.type) {
                         ChartType.Line -> {
                             val scope = this as XYGraphScope<Double, Float>
-                            scope.LineChart(data, xValues, layout.tooltips.isTooltips, colors, layout.yAxis.range)
+                            scope.LineChart(data, xValues, layout.tooltips.isTooltips, layout.tooltips.isSymbol, colors, layout.yAxis.range)
                         }
 
                         ChartType.VerticalBar -> {
@@ -567,6 +567,7 @@ fun XYGraphScope<Double, Float>.LineChart(
     data: Any,
     xValues: Any,
     usableTooltips: Boolean,
+    usableSymbol: Boolean = false,
     colors: Map<String, Color>,
     range: ClosedFloatingPointRange<Float>
 ) {
@@ -588,24 +589,35 @@ fun XYGraphScope<Double, Float>.LineChart(
                 strokeWidth = 1.dp),
             symbol = { point ->
 
-                /*
-                TooltipBox(
-                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-                        TooltipAnchorPosition.Above),
-                    tooltip = {
-                        if (false) {
-                            PlainTooltip { Text("${key}\n${formatLongToDateTime(point.x)}\n${ kotlin.math.round(point.y * 10) / 10.0}") }
-                        }
-                    },
-                    state = rememberTooltipState(),
-                ) {
-                    Symbol(
-                        shape = ShapeDefaults.ExtraSmall,
-                        fillBrush = SolidColor(colors[key] ?: Color.Black),
-                        size = 1.dp,
-                    )
+                if(usableSymbol) {
+
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                            TooltipAnchorPosition.Above
+                        ),
+                        tooltip = {
+                            if (usableTooltips) {
+                                PlainTooltip {
+                                    Text(
+                                        "${key}\n${formatLongToDateTime(point.x)}\n${
+                                            kotlin.math.round(
+                                                point.y * 10
+                                            ) / 10.0
+                                        }"
+                                    )
+                                }
+                            }
+                        },
+                        state = rememberTooltipState(),
+                    ) {
+                        Symbol(
+                            shape = ShapeDefaults.ExtraSmall,
+                            fillBrush = SolidColor(colors[key] ?: Color.Black),
+                            size = 3.dp,
+                        )
+                    }
                 }
-                 */
+
             },
         )
     }
@@ -668,7 +680,7 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
         bar = { index, _, _ ->
 
             DefaultBar(
-                brush = SolidColor( if (isHoverState.value && hoverLine.value == values[index].x) Color.Blue.copy(0.5f) else Color.Transparent),
+                brush = SolidColor( if (isHoverState.value && hoverLine.value == values[index].x) Color.Gray.copy(0.5f) else Color.Transparent),
         //        brush = SolidColor( Color.Transparent),
                 modifier = Modifier
                     .fillMaxWidth()

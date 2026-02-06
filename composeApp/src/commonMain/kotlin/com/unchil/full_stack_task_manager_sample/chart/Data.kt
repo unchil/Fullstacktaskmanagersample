@@ -53,7 +53,10 @@ data class CaptionConfig(
 )
 
 // 5. 툴팁 및 크기 설정
-data class TooltipConfig(val isTooltips: Boolean = true)
+data class TooltipConfig(
+    val isTooltips: Boolean = true,
+    val isSymbol: Boolean = false,
+)
 
 data class SizeConfig(
     val height: Dp = 400.dp,

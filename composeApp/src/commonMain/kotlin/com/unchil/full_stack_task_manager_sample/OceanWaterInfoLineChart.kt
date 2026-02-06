@@ -28,6 +28,7 @@ import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.SizeConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
+import com.unchil.full_stack_task_manager_sample.chart.TooltipConfig
 import com.unchil.full_stack_task_manager_sample.chart.paddingMod
 import com.unchil.full_stack_task_manager_sample.chart.toLineTriple
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
@@ -97,6 +98,7 @@ fun OceanWaterInfoLineChart(viewModel: NifsSeaWaterInfoViewModel){
                     range = range,
                     model = FloatLinearAxisModel(range)
                 ),
+                tooltips = TooltipConfig(isTooltips = true, isSymbol = true),
                 size = SizeConfig(height = chartHeight),
                 caption = CaptionConfig(true,chartCaption ),
             )
