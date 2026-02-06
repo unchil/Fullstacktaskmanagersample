@@ -89,14 +89,15 @@ fun AxisLabel(
 @Composable
 fun BoxPlotTooltips(
     text: String,
-    modifier:Modifier = Modifier.width(100.dp)
+    modifier:Modifier = Modifier.width(100.dp),
+    textAlign: TextAlign = TextAlign.Start
 ) {
     Text(
         text,
-        textAlign= TextAlign.Center,
+        textAlign= textAlign ,
         style = TextStyle(fontSize=TextUnit(12f, TextUnitType.Sp)),
-        modifier = modifier,
-        color = Color.LightGray)
+        modifier = modifier.padding(start = 6.dp, top= 2.dp, bottom = 2.dp),
+        color = Color.White)
 
 }
 

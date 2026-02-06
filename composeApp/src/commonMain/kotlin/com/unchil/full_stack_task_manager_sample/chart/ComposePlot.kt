@@ -488,14 +488,14 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
                         Column{
 
                             val modifier = Modifier.width(100.dp).padding(vertical = 1.dp)
-                                .background( color =  Color.DarkGray.copy(0.5f), shape = ShapeDefaults.Small)
+                                .background( color =  Color.DarkGray, shape = ShapeDefaults.Small)
 
-                            BoxPlotTooltips(values[i].x, modifier)
-                            BoxPlotTooltips("max:${data[i].max}", modifier)
-                            BoxPlotTooltips("75%:${data[i].q3}", modifier)
-                            BoxPlotTooltips("50%:${data[i].median}", modifier)
-                            BoxPlotTooltips("25%:${data[i].q1}", modifier)
-                            BoxPlotTooltips("min:${data[i].min}", modifier)
+                            BoxPlotTooltips(values[i].x, modifier, TextAlign.Center)
+                            BoxPlotTooltips("max : ${data[i].max}", modifier)
+                            BoxPlotTooltips("75% : ${data[i].q3}", modifier)
+                            BoxPlotTooltips("50% : ${data[i].median}", modifier)
+                            BoxPlotTooltips("25% : ${data[i].q1}", modifier)
+                            BoxPlotTooltips("min : ${data[i].min}", modifier)
 
 
 
@@ -675,6 +675,7 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
         isHoverState.value = false
     }
 
+
     VerticalBarPlot(
         values,
         bar = { index, _, _ ->
@@ -702,6 +703,7 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                             }
                         }
                     },
+
             ){
                 if (usableTooltips) {
                     val  horizontalAlignment: Alignment.Horizontal = if (index > values.size / 2) Alignment.Start else Alignment.End
@@ -731,12 +733,13 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                             BoxPlotTooltips(
                                 formatLongToDateTime(values[index].x),
                                 Modifier.width(defaultBarWidth).padding(vertical = 1.dp)
-                                .background( color = Color.Gray, shape = ShapeDefaults.Small)
+                                .background( color = Color.DarkGray, shape = ShapeDefaults.Small),
+                                TextAlign.Center
                             )
                             // 4. 정렬된 리스트를 순회하며 툴팁을 그립니다.
                             sortedEntries.forEach {  (observatory, value) ->
                                 BoxPlotTooltips(
-                                    "${observatory} ${value}",
+                                    "${observatory} : ${value}",
                                     Modifier.width(defaultBarWidth).padding(vertical = 1.dp)
                                     .background( color = colors[observatory] as Color, shape = ShapeDefaults.Small)
                                 )
