@@ -42,12 +42,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
 import com.unchil.full_stack_task_manager_sample.SeaWaterBoxPlotStat
@@ -207,6 +213,7 @@ fun ComposePlot(
                         )
                     ),
                     gridStyle  = rememberGridStyle(  ),
+                    modifier = Modifier.padding(horizontal = 2.dp)
                 ) {
                     when (layout.type) {
                         ChartType.Line -> {
@@ -487,15 +494,33 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
                     ) {
                         Column{
 
-                            val modifier = Modifier.width(100.dp).padding(vertical = 1.dp)
-                                .background( color =  Color.DarkGray, shape = ShapeDefaults.Small)
 
-                            BoxPlotTooltips(values[i].x, modifier, TextAlign.Center)
-                            BoxPlotTooltips("max : ${data[i].max}", modifier)
-                            BoxPlotTooltips("75% : ${data[i].q3}", modifier)
-                            BoxPlotTooltips("50% : ${data[i].median}", modifier)
-                            BoxPlotTooltips("25% : ${data[i].q1}", modifier)
-                            BoxPlotTooltips("min : ${data[i].min}", modifier)
+                            val modifier = Modifier.width(80.dp).padding(vertical = 1.dp)
+                                .border(1.dp, color=Color.DarkGray, ShapeDefaults.Small)
+                                .background(color =  Color.DarkGray, shape = ShapeDefaults.Small)
+
+
+                            val textStyleTitle = TextStyle(
+                                color = Color.White,
+                                fontSize =  10.sp,
+                                fontStyle = FontStyle.Italic,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+
+                            val textStyle = TextStyle(
+                                color = Color.White,
+                                fontSize =  10.sp,
+                                fontWeight = FontWeight.Light,
+                                textAlign = TextAlign.Center
+                            )
+
+                            BoxPlotTooltips(values[i].x, modifier, textStyleTitle)
+                            BoxPlotTooltips("max : ${data[i].max}", modifier, textStyle)
+                            BoxPlotTooltips("75% : ${data[i].q3}", modifier, textStyle)
+                            BoxPlotTooltips("50% : ${data[i].median}", modifier, textStyle)
+                            BoxPlotTooltips("25% : ${data[i].q1}", modifier, textStyle)
+                            BoxPlotTooltips("min : ${data[i].min}", modifier, textStyle)
 
 
 
@@ -596,6 +621,7 @@ fun XYGraphScope<Double, Float>.LineChart(
                             TooltipAnchorPosition.Above
                         ),
                         tooltip = {
+                            /*
                             if (usableTooltips) {
                                 PlainTooltip {
                                     Text(
@@ -607,13 +633,14 @@ fun XYGraphScope<Double, Float>.LineChart(
                                     )
                                 }
                             }
+                             */
                         },
                         state = rememberTooltipState(),
                     ) {
                         Symbol(
                             shape = ShapeDefaults.ExtraSmall,
                             fillBrush = SolidColor(colors[key] ?: Color.Black),
-                            size = 3.dp,
+                            size = 4.dp,
                         )
                     }
                 }
@@ -684,7 +711,6 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                 brush = SolidColor( if (isHoverState.value && hoverLine.value == values[index].x) Color.Gray.copy(0.5f) else Color.Transparent),
         //        brush = SolidColor( Color.Transparent),
                 modifier = Modifier
-                    .fillMaxWidth()
                     .zIndex(if (isHoverState.value && hoverLine.value == values[index].x) 1f else 0f)
                     .pointerInput(Unit) {
                         awaitPointerEventScope {
@@ -706,10 +732,10 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
 
             ){
                 if (usableTooltips) {
-                    val  horizontalAlignment: Alignment.Horizontal = if (index > values.size / 2) Alignment.Start else Alignment.End
+                    val  horizontalAlignment: Alignment.Horizontal = if (index > (values.size / 2) ) Alignment.Start else Alignment.End
                     Box(
                         modifier = Modifier
-                      //      .border(1.dp, color=Color.Black)
+                         //   .border(1.dp, color=Color.Black)
                             .wrapContentSize(unbounded = true)
                             .background(
                                 color = Color.Transparent,
@@ -720,8 +746,8 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
 
                         Column(
                             modifier = Modifier
-                         //       .border(1.dp, color=Color.Black)
-                                .width(defaultBarWidth + defaultBarWidth + 30.dp),
+                           //     .border(1.dp, color=Color.Black)
+                                .width(defaultBarWidth + defaultBarWidth + 20.dp),
                             horizontalAlignment = horizontalAlignment,
                         ){
                             // 1. 현재 x축 인덱스(index)에 해당하는 모든 관측소의 데이터를 가져옵니다.
@@ -730,18 +756,40 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
                                 entry.key to (entry.value.getOrNull(index) ?: 0f)
                             }.sortedByDescending { it.second } // 2. 값을 기준으로 내림차순 정렬 (큰 값이 위로)
                             // 3. 차트 제목(시간)을 먼저 표시합니다.
+
+                            val modifier = Modifier
+                                .width(defaultBarWidth)
+                                .padding(vertical = 1.dp)
+                                .border(1.dp, color=Color.DarkGray, ShapeDefaults.Small)
+                                .background( color = DarkGray, shape = ShapeDefaults.Small)
+
+                            val textStyleTitle = TextStyle(
+                                color = Color.White,
+                                fontSize =  10.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontStyle = FontStyle.Italic,
+                                textAlign = TextAlign.Center
+                            )
+                            val textStyle = TextStyle(
+                                color = Color.White,
+                                fontSize =  10.sp,
+                                fontWeight = FontWeight.Light,
+                                textAlign = TextAlign.Start
+                            )
+
+
                             BoxPlotTooltips(
                                 formatLongToDateTime(values[index].x),
-                                Modifier.width(defaultBarWidth).padding(vertical = 1.dp)
-                                .background( color = Color.DarkGray, shape = ShapeDefaults.Small),
-                                TextAlign.Center
+                                modifier,
+                                textStyleTitle
                             )
                             // 4. 정렬된 리스트를 순회하며 툴팁을 그립니다.
                             sortedEntries.forEach {  (observatory, value) ->
+
                                 BoxPlotTooltips(
                                     "${observatory} : ${value}",
-                                    Modifier.width(defaultBarWidth).padding(vertical = 1.dp)
-                                    .background( color = colors[observatory] as Color, shape = ShapeDefaults.Small)
+                                    modifier.background( color = colors[observatory] as Color, shape = ShapeDefaults.Small),
+                                    textStyle
                                 )
                             }
                         }

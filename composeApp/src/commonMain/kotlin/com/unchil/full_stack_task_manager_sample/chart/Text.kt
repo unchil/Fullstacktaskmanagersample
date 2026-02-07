@@ -2,8 +2,10 @@ package com.unchil.full_stack_task_manager_sample.chart
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -14,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Modifier.Companion.then
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -89,15 +92,25 @@ fun AxisLabel(
 @Composable
 fun BoxPlotTooltips(
     text: String,
-    modifier:Modifier = Modifier.width(100.dp),
-    textAlign: TextAlign = TextAlign.Start
+    modifier:Modifier? = null,
+    textStyle: TextStyle? = null
 ) {
-    Text(
-        text,
-        textAlign= textAlign ,
-        style = TextStyle(fontSize=TextUnit(12f, TextUnitType.Sp)),
-        modifier = modifier.padding(start = 6.dp, top= 2.dp, bottom = 2.dp),
-        color = Color.White)
+
+    Box(
+        modifier = modifier ?: Modifier.width(120.dp),
+        contentAlignment = Alignment.Center,
+    ){
+        Text(
+            text,
+            style = textStyle ?: TextStyle.Default,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 6.dp).padding(vertical = 2.dp),
+            color = Color.White
+        )
+
+    }
+
 
 }
 
