@@ -599,8 +599,15 @@ fun XYGraphScope<Double, Float>.LineChart(
 
     val data = (data as Map<String, List<Float>>)
     val xValues = (xValues as List<Double>)
-    data.entries.sortedBy { it.key }
-        .forEach { (key, values) ->
+
+
+    val isVisibleSymbol = remember{mutableStateOf(0)}
+
+    val onHoverEvent = { index:Int ->
+        isVisibleSymbol.value = index
+    }
+
+    data.entries.sortedBy { it.key }.forEach { (key, values) ->
 
         LinePlot2(
             data = values.mapIndexed { index, value ->
@@ -614,39 +621,39 @@ fun XYGraphScope<Double, Float>.LineChart(
                 strokeWidth = 1.dp),
             symbol = { point ->
 
-                if(usableSymbol) {
-
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-                            TooltipAnchorPosition.Above
-                        ),
-                        tooltip = {
-                            /*
-                            if (usableTooltips) {
-                                PlainTooltip {
-                                    Text(
-                                        "${key}\n${formatLongToDateTime(point.x)}\n${
-                                            kotlin.math.round(
-                                                point.y * 10
-                                            ) / 10.0
-                                        }"
-                                    )
-                                }
+                TooltipBox(
+                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                        TooltipAnchorPosition.Above
+                    ),
+                    tooltip = {
+                        /*
+                        if (usableTooltips) {
+                            PlainTooltip {
+                                Text(
+                                    "${key}\n${formatLongToDateTime(point.x)}\n${
+                                        kotlin.math.round(
+                                            point.y * 10
+                                        ) / 10.0
+                                    }"
+                                )
                             }
-                             */
-                        },
-                        state = rememberTooltipState(),
-                    ) {
-                        Symbol(
-                            shape = ShapeDefaults.ExtraSmall,
-                            fillBrush = SolidColor(colors[key] ?: Color.Black),
-                            size = 4.dp,
-                        )
-                    }
+                        }
+                         */
+                    },
+                    state = rememberTooltipState(),
+                ) {
+                    Symbol(
+                        shape = ShapeDefaults.ExtraSmall,
+                        fillBrush = SolidColor(colors[key] ?: Color.Black),
+                        size = 4.dp,
+                        alpha = if(usableSymbol) 1.0f else { if( isVisibleSymbol.value == xValues.indexOf(point.x)) 1.0f else 0f}
+                    )
                 }
+
 
             },
         )
+
     }
 
 
@@ -655,7 +662,8 @@ fun XYGraphScope<Double, Float>.LineChart(
         xValues,
         usableTooltips,
         colors,
-        range
+        range,
+        onHoverEvent
     )
 
 
@@ -667,7 +675,8 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
     xValues: List<Double>,
     usableTooltips: Boolean,
     colors: Map<String, Color>,
-    range: ClosedFloatingPointRange<Float>
+    range: ClosedFloatingPointRange<Float>,
+    onHoverEvent:((Int)->Unit)? = null
 ){
 
     val defaultBarWidth = remember { 120.dp }
@@ -695,11 +704,13 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
         hoverLine.value = x
         currentIndex.value = index
         isHoverState.value = true
+        onHoverEvent?.invoke(index)
     }
 
     // 마우스가 막대를 벗어났을 때 호출할 핸들러
     val onExitHandler = {
         isHoverState.value = false
+        onHoverEvent?.invoke(-1)
     }
 
 
