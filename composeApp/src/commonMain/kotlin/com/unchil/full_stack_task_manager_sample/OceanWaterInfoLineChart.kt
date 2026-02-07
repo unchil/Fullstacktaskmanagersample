@@ -2,10 +2,25 @@ package com.unchil.full_stack_task_manager_sample
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
+
+
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +56,8 @@ import io.github.koalaplot.core.xygraph.TickPosition
 import kotlinx.coroutines.delay
 
 
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OceanWaterInfoLineChart(viewModel: NifsSeaWaterInfoViewModel){
 
@@ -61,6 +78,8 @@ fun OceanWaterInfoLineChart(viewModel: NifsSeaWaterInfoViewModel){
     val chartYTitle = remember { "Water Temperature °C"}
     val chartCaption = remember {"from https://www.nifs.go.kr (National Institute of Fisheries Science)"}
 
+    var isTooltips by remember { mutableStateOf(true) }
+    var isSymbol by remember { mutableStateOf(true) }
 
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
 
@@ -98,7 +117,7 @@ fun OceanWaterInfoLineChart(viewModel: NifsSeaWaterInfoViewModel){
                     range = range,
                     model = FloatLinearAxisModel(range)
                 ),
-                tooltips = TooltipConfig(isTooltips = true, isSymbol = true),
+                tooltips = TooltipConfig(isTooltips = isTooltips, isSymbol = isSymbol),
                 size = SizeConfig(height = chartHeight),
                 caption = CaptionConfig(true,chartCaption ),
             )
@@ -115,9 +134,19 @@ fun OceanWaterInfoLineChart(viewModel: NifsSeaWaterInfoViewModel){
         }
     }
 
+    LaunchedEffect(isTooltips, isSymbol){
+        chartLayout.value = chartLayout.value.copy(
+            tooltips = chartLayout.value.tooltips.copy(
+                isTooltips = isTooltips,
+                isSymbol = isSymbol
+            )
+        )
+    }
+
 
 
     Column (modifier = paddingMod) {
+
 
             Row {
                 SEA_AREA.GRU_NAME.entries.forEach { entrie ->
@@ -142,6 +171,20 @@ fun OceanWaterInfoLineChart(viewModel: NifsSeaWaterInfoViewModel){
                 }
             }
         if (isVisible) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ToggleButton(
+                    checked = isTooltips,
+                    onCheckedChange = {
+                        isTooltips = it
+                    },
+                ){  Text(  text = "Tooltips"   )  }
+                VerticalDivider()
+                ToggleButton(
+                    checked = isSymbol,
+                    onCheckedChange = { isSymbol = it }
+                ){  Text(  text = "Symbol"   )  }
+            }
+
             ComposePlot(
                 layout = chartLayout.value,
                 data = values.value,

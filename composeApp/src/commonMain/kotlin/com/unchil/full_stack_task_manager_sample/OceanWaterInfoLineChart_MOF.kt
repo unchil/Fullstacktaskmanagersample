@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,6 +30,7 @@ import com.unchil.full_stack_task_manager_sample.chart.LayoutData
 import com.unchil.full_stack_task_manager_sample.chart.LegendConfig
 import com.unchil.full_stack_task_manager_sample.chart.SizeConfig
 import com.unchil.full_stack_task_manager_sample.chart.TitleConfig
+import com.unchil.full_stack_task_manager_sample.chart.TooltipConfig
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.desc
 import com.unchil.full_stack_task_manager_sample.chart.WATER_QUALITY.name
@@ -40,6 +43,7 @@ import io.github.koalaplot.core.xygraph.DoubleLinearAxisModel
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OceanWaterInfoLineChart_MOF(viewModel: MofSeaWaterInfoViewModel){
 
@@ -65,6 +69,8 @@ fun OceanWaterInfoLineChart_MOF(viewModel: MofSeaWaterInfoViewModel){
     val chartXTitle = remember { "DateTime"}
     val chartCaption = remember {"from https://www.mof.go.kr (Ministry of Oceans and Fisheries)"}
 
+    var isTooltips by remember { mutableStateOf(true) }
+    var isSymbol by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1= seaWaterInfo.value, key2=selectedOption){
 
@@ -148,6 +154,7 @@ fun OceanWaterInfoLineChart_MOF(viewModel: MofSeaWaterInfoViewModel){
                 ),
                 size = SizeConfig(chartHeight),
                 caption = CaptionConfig(true,chartCaption  ),
+                tooltips = TooltipConfig(isTooltips, isSymbol)
             )
 
         }else {
@@ -162,9 +169,35 @@ fun OceanWaterInfoLineChart_MOF(viewModel: MofSeaWaterInfoViewModel){
         }
     }
 
+
+
+    LaunchedEffect(isTooltips, isSymbol){
+        chartLayout.value = chartLayout.value.copy(
+            tooltips = chartLayout.value.tooltips.copy(
+                isTooltips = isTooltips,
+                isSymbol = isSymbol
+            )
+        )
+    }
+
+
     Column (modifier = paddingMod) {
 
         if (isVisible) {
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ToggleButton(
+                    checked = isTooltips,
+                    onCheckedChange = {
+                        isTooltips = it
+                    }
+                ){  Text(  text = "Tooltips"   )  }
+                ToggleButton(
+                    checked = isSymbol,
+                    onCheckedChange = { isSymbol = it }
+                ){  Text(  text = "Symbol"   )  }
+            }
+
 
             ComposePlot(
                 layout = chartLayout.value,
