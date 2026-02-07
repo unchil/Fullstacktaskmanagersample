@@ -655,6 +655,7 @@ fun XYGraphScope<Double, Float>.LineChart(
 
                 // 2. 상태에 따른 크기와 투명도 결정
                 val symbolSize = when {
+                    isPressed -> 8.dp
                     isHovered -> 6.dp
                     usableSymbol -> 4.dp
                     else -> 0.dp
@@ -693,6 +694,7 @@ fun XYGraphScope<Double, Float>.LineChart(
                    Symbol(
                        modifier = Modifier.clickable(
                            interactionSource =interactionSource,
+                           indication = null, // 리플 효과
                            onClick = {
 
                            }
