@@ -4,7 +4,11 @@ package com.unchil.full_stack_task_manager_sample.chart
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.absolutePadding
@@ -34,7 +38,9 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -603,11 +609,36 @@ fun XYGraphScope<Double, Float>.LineChart(
 
     val isVisibleSymbol = remember{mutableStateOf(0)}
 
+
     val onHoverEvent = { index:Int ->
         isVisibleSymbol.value = index
     }
 
+
+    VerticalBarChart(
+        data,
+        xValues,
+        usableTooltips,
+        colors,
+        range,
+        onHoverEvent
+    )
+
+
+
     data.entries.sortedBy { it.key }.forEach { (key, values) ->
+
+        val strokeWidth = remember{ mutableStateOf(1.dp)}
+        val isPressed = remember{mutableStateOf(false)}
+        val isUsableSymbolTooltips = remember{mutableStateOf(false)}
+
+        if(isPressed.value){
+            strokeWidth.value = 3.dp
+            isUsableSymbolTooltips.value = true
+        } else{
+            strokeWidth.value = 1.dp
+            isUsableSymbolTooltips.value = false
+        }
 
         LinePlot2(
             data = values.mapIndexed { index, value ->
@@ -618,8 +649,9 @@ fun XYGraphScope<Double, Float>.LineChart(
             },
             lineStyle = LineStyle(
                 brush = SolidColor(colors[key] ?: Color.Black),
-                strokeWidth = 1.dp),
+                strokeWidth = strokeWidth.value),
             symbol = { point ->
+
                 // 1. 현재 포인트가 호버 상태인지 미리 판별
                 val isHovered = isVisibleSymbol.value == xValues.indexOf(point.x)
 
@@ -635,13 +667,15 @@ fun XYGraphScope<Double, Float>.LineChart(
                     else -> 0f
                 }
 
-               TooltipBox(
+
+
+                TooltipBox(
                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
                        TooltipAnchorPosition.Above
                    ),
                    tooltip = {
-                       /*
-                    if (usableTooltips) {
+
+                    if (isUsableSymbolTooltips.value) {
                         PlainTooltip {
                             Text(
                                 "${key}\n${formatLongToDateTime(point.x)}\n${
@@ -652,13 +686,18 @@ fun XYGraphScope<Double, Float>.LineChart(
                             )
                         }
                     }
-                     */
+
                    },
                    state = rememberTooltipState(),
                ) {
 
-                   val isHovered = isVisibleSymbol.value == xValues.indexOf(point.x)
+
                    Symbol(
+                       modifier = Modifier.clickable(
+                           onClick = {
+                               isPressed.value = !isPressed.value
+                           }
+                       ),
                        shape = ShapeDefaults.ExtraSmall,
                        fillBrush = SolidColor(colors[key] ?: Color.Black),
                        size = symbolSize,
@@ -673,15 +712,6 @@ fun XYGraphScope<Double, Float>.LineChart(
 
     }
 
-
-    VerticalBarChart(
-        data,
-        xValues,
-        usableTooltips,
-        colors,
-        range,
-        onHoverEvent
-    )
 
 
 }
