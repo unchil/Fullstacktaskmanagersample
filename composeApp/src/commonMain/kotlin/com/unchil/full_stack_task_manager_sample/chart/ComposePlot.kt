@@ -599,7 +599,7 @@ fun XYGraphScope<String, Float>.BoxPlotOutliers(
 fun XYGraphScope<Double, Float>.LineChart(
     data: Any,
     xValues: Any,
-    usableTooltips: Boolean,
+    usableTooltips: Boolean = false,
     usableSymbol: Boolean = true,
     colors: Map<String, Color>,
     range: ClosedFloatingPointRange<Float>
@@ -616,15 +616,17 @@ fun XYGraphScope<Double, Float>.LineChart(
         isVisibleSymbol.value = index
     }
 
+    if(usableTooltips) {
+        VerticalBarChart(
+            data,
+            xValues,
+            usableTooltips,
+            colors,
+            range,
+            onHoverEvent
+        )
+    }
 
-    VerticalBarChart(
-        data,
-        xValues,
-        usableTooltips,
-        colors,
-        range,
-        onHoverEvent
-    )
 
 
 
@@ -657,6 +659,7 @@ fun XYGraphScope<Double, Float>.LineChart(
                 val symbolSize = when {
                     isPressed -> 8.dp
                     isHovered -> 6.dp
+                    isUsableSymbolTooltips -> 6.dp
                     usableSymbol -> 4.dp
                     else -> 0.dp
                 }
