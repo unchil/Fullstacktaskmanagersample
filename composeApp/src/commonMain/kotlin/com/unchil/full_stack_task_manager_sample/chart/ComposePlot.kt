@@ -502,7 +502,7 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
 
                             val textStyleTitle = TextStyle(
                                 color = Color.White,
-                                fontSize =  10.sp,
+                                fontSize =  12.sp,
                                 fontStyle = FontStyle.Italic,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center
@@ -510,7 +510,7 @@ fun XYGraphScope<String, Float>.BoxPlotChart(
 
                             val textStyle = TextStyle(
                                 color = Color.White,
-                                fontSize =  10.sp,
+                                fontSize =  12.sp,
                                 fontWeight = FontWeight.Light,
                                 textAlign = TextAlign.Center
                             )
@@ -705,13 +705,23 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
 
     VerticalBarPlot(
         values,
+        modifier = Modifier,
         bar = { index, _, _ ->
 
+            val isVisibleBar = isHoverState.value && hoverLine.value == values[index].x
+
+            val modifier = if (isVisibleBar) {
+                Modifier
+                    .zIndex(1f)
+                    .border(1.dp, color=Color.DarkGray, ShapeDefaults.Small)
+            }else {
+                Modifier.zIndex(0f)
+            }
+
             DefaultBar(
-                brush = SolidColor( if (isHoverState.value && hoverLine.value == values[index].x) Color.Gray.copy(0.5f) else Color.Transparent),
+                brush = SolidColor( if (isVisibleBar) Color.LightGray.copy(0.2f) else Color.Transparent),
         //        brush = SolidColor( Color.Transparent),
-                modifier = Modifier
-                    .zIndex(if (isHoverState.value && hoverLine.value == values[index].x) 1f else 0f)
+                modifier = modifier
                     .pointerInput(Unit) {
                         awaitPointerEventScope {
                             while (true) {
