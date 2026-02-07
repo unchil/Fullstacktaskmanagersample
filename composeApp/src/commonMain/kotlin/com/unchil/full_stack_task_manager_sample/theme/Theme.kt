@@ -1,55 +1,59 @@
-package com.unchil.full_stack_task_manager_sample.theme
+package com.unchil.composedatagrid.theme
 
-import androidx.compose.material3.MaterialTheme
+
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import fullstacktaskmanagersample.composeapp.generated.resources.NanumSquareNeo_Variable
 import fullstacktaskmanagersample.composeapp.generated.resources.Res
-import fullstacktaskmanagersample.composeapp.generated.resources.sans_kr
 import org.jetbrains.compose.resources.Font
 
-val lightScheme = lightColorScheme(
-    primary = primaryLight,
-    onPrimary = onPrimaryLight,
-    primaryContainer = primaryContainerLight,
-    onPrimaryContainer = onPrimaryContainerLight,
-    secondary = secondaryLight,
-    onSecondary = onSecondaryLight,
-    secondaryContainer = secondaryContainerLight,
-    onSecondaryContainer = onSecondaryContainerLight,
-    tertiary = tertiaryLight,
-    onTertiary = onTertiaryLight,
-    tertiaryContainer = tertiaryContainerLight,
-    onTertiaryContainer = onTertiaryContainerLight,
-    error = errorLight,
-    onError = onErrorLight,
-    errorContainer = errorContainerLight,
-    onErrorContainer = onErrorContainerLight,
-    background = backgroundLight,
-    onBackground = onBackgroundLight,
-    surface = surfaceLight,
-    onSurface = onSurfaceLight,
-    surfaceVariant = surfaceVariantLight,
-    onSurfaceVariant = onSurfaceVariantLight,
-    outline = outlineLight,
-    outlineVariant = outlineVariantLight,
-    scrim = scrimLight,
-    inverseSurface = inverseSurfaceLight,
-    inverseOnSurface = inverseOnSurfaceLight,
-    inversePrimary = inversePrimaryLight,
-    surfaceDim = surfaceDimLight,
-    surfaceBright = surfaceBrightLight,
-    surfaceContainerLowest = surfaceContainerLowestLight,
-    surfaceContainerLow = surfaceContainerLowLight,
-    surfaceContainer = surfaceContainerLight,
-    surfaceContainerHigh = surfaceContainerHighLight,
-    surfaceContainerHighest = surfaceContainerHighestLight,
-)
 
-val darkScheme = darkColorScheme(
+val lightScheme = lightColorScheme(
+        primary = primaryLight,
+        onPrimary = onPrimaryLight,
+        primaryContainer = primaryContainerLight,
+        onPrimaryContainer = onPrimaryContainerLight,
+        secondary = secondaryLight,
+        onSecondary = onSecondaryLight,
+        secondaryContainer = secondaryContainerLight,
+        onSecondaryContainer = onSecondaryContainerLight,
+        tertiary = tertiaryLight,
+        onTertiary = onTertiaryLight,
+        tertiaryContainer = tertiaryContainerLight,
+        onTertiaryContainer = onTertiaryContainerLight,
+        error = errorLight,
+        onError = onErrorLight,
+        errorContainer = errorContainerLight,
+        onErrorContainer = onErrorContainerLight,
+        background = backgroundLight,
+        onBackground = onBackgroundLight,
+        surface = surfaceLight,
+        onSurface = onSurfaceLight,
+        surfaceVariant = surfaceVariantLight,
+        onSurfaceVariant = onSurfaceVariantLight,
+        outline = outlineLight,
+        outlineVariant = outlineVariantLight,
+        scrim = scrimLight,
+        inverseSurface = inverseSurfaceLight,
+        inverseOnSurface = inverseOnSurfaceLight,
+        inversePrimary = inversePrimaryLight,
+        surfaceDim = surfaceDimLight,
+        surfaceBright = surfaceBrightLight,
+        surfaceContainerLowest = surfaceContainerLowestLight,
+        surfaceContainerLow = surfaceContainerLowLight,
+        surfaceContainer = surfaceContainerLight,
+        surfaceContainerHigh = surfaceContainerHighLight,
+        surfaceContainerHighest = surfaceContainerHighestLight,
+    )
+
+ val darkScheme = darkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
     primaryContainer = primaryContainerDark,
@@ -87,7 +91,7 @@ val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
-val mediumContrastLightColorScheme = lightColorScheme(
+ val mediumContrastLightColorScheme = lightColorScheme(
     primary = primaryLightMediumContrast,
     onPrimary = onPrimaryLightMediumContrast,
     primaryContainer = primaryContainerLightMediumContrast,
@@ -125,7 +129,7 @@ val mediumContrastLightColorScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLightMediumContrast,
 )
 
-val highContrastLightColorScheme = lightColorScheme(
+ val highContrastLightColorScheme = lightColorScheme(
     primary = primaryLightHighContrast,
     onPrimary = onPrimaryLightHighContrast,
     primaryContainer = primaryContainerLightHighContrast,
@@ -163,7 +167,7 @@ val highContrastLightColorScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLightHighContrast,
 )
 
-val mediumContrastDarkColorScheme = darkColorScheme(
+ val mediumContrastDarkColorScheme = darkColorScheme(
     primary = primaryDarkMediumContrast,
     onPrimary = onPrimaryDarkMediumContrast,
     primaryContainer = primaryContainerDarkMediumContrast,
@@ -201,7 +205,7 @@ val mediumContrastDarkColorScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDarkMediumContrast,
 )
 
-val highContrastDarkColorScheme = darkColorScheme(
+ val highContrastDarkColorScheme = darkColorScheme(
     primary = primaryDarkHighContrast,
     onPrimary = onPrimaryDarkHighContrast,
     primaryContainer = primaryContainerDarkHighContrast,
@@ -241,47 +245,27 @@ val highContrastDarkColorScheme = darkColorScheme(
 
 
 @Composable
-fun AppTheme(enableDarkMode: Boolean = false, content: @Composable () -> Unit) {
-    
-
-    val Sans_Kr = FontFamily(
-        Font(Res.font.sans_kr, FontWeight.Bold),
-        Font(Res.font.sans_kr, FontWeight.SemiBold),
-        Font(Res.font.sans_kr, FontWeight.ExtraBold),
-        Font(Res.font.sans_kr, FontWeight.Medium),
-        Font(Res.font.sans_kr, FontWeight.Normal),
-        Font(Res.font.sans_kr, FontWeight.Black),
-        Font(Res.font.sans_kr, FontWeight.Thin),
-        Font(Res.font.sans_kr, FontWeight.ExtraLight),
-        Font(Res.font.sans_kr, FontWeight.Light)
-
+fun getTypography(): Typography{
+    val nanumFontFamily = FontFamily(
+        Font(Res.font.NanumSquareNeo_Variable, FontWeight.Normal),
     )
-
-    val AppTypography = Typography(
-        displayLarge = Typography().displayLarge.copy(fontFamily = Sans_Kr),
-        displayMedium = Typography().displayMedium.copy(fontFamily = Sans_Kr),
-        displaySmall = Typography().displaySmall.copy(fontFamily = Sans_Kr),
-        headlineLarge = Typography().headlineLarge.copy(fontFamily = Sans_Kr),
-        headlineMedium = Typography().headlineMedium.copy(fontFamily = Sans_Kr),
-        headlineSmall = Typography().headlineSmall.copy(fontFamily = Sans_Kr),
-        titleLarge = Typography().titleLarge.copy(fontFamily = Sans_Kr),
-        titleMedium = Typography().titleMedium.copy(fontFamily = Sans_Kr),
-        titleSmall = Typography().titleSmall.copy(fontFamily = Sans_Kr),
-        bodyLarge = Typography().bodyLarge.copy(fontFamily = Sans_Kr),
-        bodyMedium = Typography().bodyMedium.copy(fontFamily = Sans_Kr),
-        bodySmall = Typography().bodySmall.copy(fontFamily = Sans_Kr),
-        labelLarge = Typography().labelLarge.copy(fontFamily = Sans_Kr),
-        labelMedium = Typography().labelMedium.copy(fontFamily = Sans_Kr),
-        labelSmall = Typography().labelSmall.copy(fontFamily = Sans_Kr)
+    return Typography(
+        bodyLarge = TextStyle(
+            fontFamily = nanumFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp
+        ),
+        titleLarge = TextStyle(
+            fontFamily = nanumFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp
+        )
     )
-
-    val colorScheme = if(enableDarkMode) darkScheme else lightScheme
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AppTypography
-    ) {
-        content()
-    }
-
 }
+
+
+
+fun getColorScheme(enableDarkMode: Boolean): ColorScheme {
+    return if (enableDarkMode) darkScheme else lightScheme
+}
+

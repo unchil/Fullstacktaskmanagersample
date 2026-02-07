@@ -803,14 +803,14 @@ fun XYGraphScope<Double, Float>.VerticalBarChart(
 
                             val textStyleTitle = TextStyle(
                                 color = Color.White,
-                                fontSize =  10.sp,
+                                fontSize =  12.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontStyle = FontStyle.Italic,
                                 textAlign = TextAlign.Center
                             )
                             val textStyle = TextStyle(
                                 color = Color.White,
-                                fontSize =  10.sp,
+                                fontSize =  12.sp,
                                 fontWeight = FontWeight.Light,
                                 textAlign = TextAlign.Start
                             )

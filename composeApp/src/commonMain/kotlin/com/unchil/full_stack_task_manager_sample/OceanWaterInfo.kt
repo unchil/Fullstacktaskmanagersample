@@ -20,8 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unchil.composedatagrid.theme.getColorScheme
+import com.unchil.composedatagrid.theme.getTypography
 import com.unchil.full_stack_task_manager_sample.chart.paddingMod
-import com.unchil.full_stack_task_manager_sample.theme.AppTheme
 import com.unchil.full_stack_task_manager_sample.viewmodel.MofSeaWaterInfoViewModel
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoViewModel
@@ -57,7 +58,10 @@ fun OceanWaterInfo(){
     }
 
 
-    AppTheme(enableDarkMode=false) {
+    MaterialTheme(
+        typography = getTypography(),
+        colorScheme = getColorScheme(false)
+    ) {
 
         Surface(
             shadowElevation = 2.dp,

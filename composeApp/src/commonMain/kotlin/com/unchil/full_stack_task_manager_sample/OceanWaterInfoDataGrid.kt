@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unchil.full_stack_task_manager_sample.chart.toGridDataMap
-import com.unchil.full_stack_task_manager_sample.theme.AppTheme
 import com.unchil.full_stack_task_manager_sample.viewmodel.NifsSeaWaterInfoCurrentViewModel
 import com.unchil.un7datagrid.Un7KCMPDataGrid
 import kotlinx.coroutines.launch
@@ -64,7 +63,7 @@ fun OceanWaterInfoDataGrid(viewModel: NifsSeaWaterInfoCurrentViewModel){
         }
     }
 
-    AppTheme(enableDarkMode=false){
+    MaterialTheme{
         Box{
             Column(
                 modifier = Modifier.fillMaxSize()

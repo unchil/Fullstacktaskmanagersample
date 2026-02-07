@@ -1,7 +1,5 @@
-package com.unchil.full_stack_task_manager_sample.theme
-
+package com.unchil.composedatagrid.theme
 import androidx.compose.ui.graphics.Color
-
 
 val primaryLight = Color(0xFF555E72)
 val onPrimaryLight = Color(0xFFFFFFFF)
@@ -218,6 +216,10 @@ val surfaceContainerLowDarkHighContrast = Color(0xFF1F1F21)
 val surfaceContainerDarkHighContrast = Color(0xFF303032)
 val surfaceContainerHighDarkHighContrast = Color(0xFF3B3B3D)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF474648)
+
+
+
+
 
 
 
