@@ -6,8 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -629,16 +631,12 @@ fun XYGraphScope<Double, Float>.LineChart(
     data.entries.sortedBy { it.key }.forEach { (key, values) ->
 
         val strokeWidth = remember{ mutableStateOf(1.dp)}
-        val isPressed = remember{mutableStateOf(false)}
-        val isUsableSymbolTooltips = remember{mutableStateOf(false)}
 
-        if(isPressed.value){
-            strokeWidth.value = 3.dp
-            isUsableSymbolTooltips.value = true
-        } else{
-            strokeWidth.value = 1.dp
-            isUsableSymbolTooltips.value = false
-        }
+        val interactionSource = remember { MutableInteractionSource() }
+        val isPressed by interactionSource.collectIsPressedAsState()
+        val isUsableSymbolTooltips by interactionSource.collectIsHoveredAsState()
+
+        strokeWidth.value = if(isPressed) 3.dp else 1.dp
 
         LinePlot2(
             data = values.mapIndexed { index, value ->
@@ -675,7 +673,7 @@ fun XYGraphScope<Double, Float>.LineChart(
                    ),
                    tooltip = {
 
-                    if (isUsableSymbolTooltips.value) {
+                    if (isUsableSymbolTooltips) {
                         PlainTooltip {
                             Text(
                                 "${key}\n${formatLongToDateTime(point.x)}\n${
@@ -694,8 +692,9 @@ fun XYGraphScope<Double, Float>.LineChart(
 
                    Symbol(
                        modifier = Modifier.clickable(
+                           interactionSource =interactionSource,
                            onClick = {
-                               isPressed.value = !isPressed.value
+
                            }
                        ),
                        shape = ShapeDefaults.ExtraSmall,
