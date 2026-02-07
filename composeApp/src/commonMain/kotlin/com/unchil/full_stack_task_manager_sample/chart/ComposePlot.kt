@@ -620,35 +620,52 @@ fun XYGraphScope<Double, Float>.LineChart(
                 brush = SolidColor(colors[key] ?: Color.Black),
                 strokeWidth = 1.dp),
             symbol = { point ->
+                // 1. 현재 포인트가 호버 상태인지 미리 판별
+                val isHovered = isVisibleSymbol.value == xValues.indexOf(point.x)
 
-                TooltipBox(
-                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-                        TooltipAnchorPosition.Above
-                    ),
-                    tooltip = {
-                        /*
-                        if (usableTooltips) {
-                            PlainTooltip {
-                                Text(
-                                    "${key}\n${formatLongToDateTime(point.x)}\n${
-                                        kotlin.math.round(
-                                            point.y * 10
-                                        ) / 10.0
-                                    }"
-                                )
-                            }
-                        }
-                         */
-                    },
-                    state = rememberTooltipState(),
-                ) {
-                    Symbol(
-                        shape = ShapeDefaults.ExtraSmall,
-                        fillBrush = SolidColor(colors[key] ?: Color.Black),
-                        size = 4.dp,
-                        alpha = if(usableSymbol) 1.0f else { if( isVisibleSymbol.value == xValues.indexOf(point.x)) 1.0f else 0f}
-                    )
+                // 2. 상태에 따른 크기와 투명도 결정
+                val symbolSize = when {
+                    isHovered -> 6.dp
+                    usableSymbol -> 4.dp
+                    else -> 0.dp
                 }
+
+                val symbolAlpha = when {
+                    isHovered || usableSymbol -> 1.0f
+                    else -> 0f
+                }
+
+               TooltipBox(
+                   positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                       TooltipAnchorPosition.Above
+                   ),
+                   tooltip = {
+                       /*
+                    if (usableTooltips) {
+                        PlainTooltip {
+                            Text(
+                                "${key}\n${formatLongToDateTime(point.x)}\n${
+                                    kotlin.math.round(
+                                        point.y * 10
+                                    ) / 10.0
+                                }"
+                            )
+                        }
+                    }
+                     */
+                   },
+                   state = rememberTooltipState(),
+               ) {
+
+                   val isHovered = isVisibleSymbol.value == xValues.indexOf(point.x)
+                   Symbol(
+                       shape = ShapeDefaults.ExtraSmall,
+                       fillBrush = SolidColor(colors[key] ?: Color.Black),
+                       size = symbolSize,
+                       alpha = symbolAlpha
+                   )
+               }
+
 
 
             },
