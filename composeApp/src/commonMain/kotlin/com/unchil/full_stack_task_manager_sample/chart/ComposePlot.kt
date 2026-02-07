@@ -592,7 +592,7 @@ fun XYGraphScope<Double, Float>.LineChart(
     data: Any,
     xValues: Any,
     usableTooltips: Boolean,
-    usableSymbol: Boolean = false,
+    usableSymbol: Boolean = true,
     colors: Map<String, Color>,
     range: ClosedFloatingPointRange<Float>
 ) {
